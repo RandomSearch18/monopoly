@@ -3,7 +3,7 @@ import math
 from collections import deque
 from enum import Enum
 
-from typing import Callable, Optional, Tuple
+from typing import Callable, Literal, Optional, Tuple
 import pygame
 from pygame import Color
 from pygame.event import Event
@@ -22,6 +22,37 @@ class Edge(Enum):
     BOTTOM = (0, 1)
     LEFT = (-1, 0)
     RIGHT = (1, 0)
+
+
+class CoordinateSpecifier:
+    """A specifier for a single coordinate value (either x or y)"""
+
+    # 0 would mean the top or left edge of the window (greater pixels value moves right/down);
+    # whereas 1 would mean the bottom or right edge of the window (greater pixels value moves left/up)
+    count_from: Literal[0, 1]
+
+    def resolve(self, outer_size: float) -> float:
+        raise NotImplementedError()
+
+    def move_by(self, pixels: float):
+        raise NotImplementedError()
+
+
+class Pixels(CoordinateSpecifier):
+    def __init__(self, pixels: float, count_from: Literal[0, 1] = 0) -> None:
+        self.pixels = pixels
+        self.count_from = count_from
+
+    def move_by(self, pixels: float):
+        pixel_movement = -pixels if self.count_from else +pixels
+        self.pixels += pixel_movement
+
+    def resolve(self, outer_size: float) -> float:
+        multiplier = self.count_from
+        start_from = outer_size if multiplier else 0
+        offset = -self.pixels if multiplier else +self.pixels
+        actual_coordinate = start_from + offset
+        return actual_coordinate
 
 
 class PointSpecifier:
@@ -90,8 +121,8 @@ class PointSpecifier:
 class PixelsPoint(PointSpecifier):
     def __init__(
         self,
-        x: float,
-        y: float,
+        x: CoordinateSpecifier,
+        y: CoordinateSpecifier,
         outer_corner: Corner = Corner.TOP_LEFT,
         self_corner: Optional[Corner] = None,
     ):
@@ -109,44 +140,21 @@ class PixelsPoint(PointSpecifier):
         self.self_corner = self_corner
 
     def resolve(self, game: Game) -> Tuple[float, float]:
-        outer_width = game.window_box().width
-        outer_height = game.window_box().height
-        multiplier_x, multiplier_y = self.outer_corner.value
-
-        # Coordinates of the window corner that we're working relative to
-        base_x_coordinate = multiplier_x * outer_width
-        base_y_coordinate = multiplier_y * outer_height
-
-        # Calculate the number of pixels away from the corner that we should be at
-        x_offset = -self.x if multiplier_x else +self.x
-        y_offset = -self.y if multiplier_y else +self.y
-
-        # Calculate the desired coordinates of the top-left of our object
-        actual_x_coordinate = base_x_coordinate + x_offset
-        actual_y_coordinate = base_y_coordinate + y_offset
-
-        # print(actual_x_coordinate, actual_y_coordinate)
-        return (actual_x_coordinate, actual_y_coordinate)
+        resolved_x_coordinate = self.x.resolve(game.width())
+        resolved_y_coordinate = self.y.resolve(game.height())
+        return (resolved_x_coordinate, resolved_y_coordinate)
 
     def move_right(self, pixels: float):
-        x_corner = self.outer_corner.value[0]
-        pixel_movement = -pixels if x_corner else +pixels
-        self.x += pixel_movement
+        self.x.move_by(pixels)
 
     def move_left(self, pixels: float):
-        x_corner = self.outer_corner.value[0]
-        pixel_movement = +pixels if x_corner else -pixels
-        self.x += pixel_movement
-
-    def move_down(self, pixels: float):
-        y_corner = self.outer_corner.value[1]
-        pixel_movement = -pixels if y_corner else +pixels
-        self.y += pixel_movement
+        self.x.move_by(-pixels)
 
     def move_up(self, pixels: float):
-        y_corner = self.outer_corner.value[1]
-        pixel_movement = +pixels if y_corner else -pixels
-        self.y += pixel_movement
+        self.y.move_by(-pixels)
+
+    def move_down(self, pixels: float):
+        self.y.move_by(pixels)
 
     def on_window_resize(self, event):
         pass

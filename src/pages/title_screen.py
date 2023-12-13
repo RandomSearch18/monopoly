@@ -4,6 +4,8 @@ from game_engine import (
     GameObject,
     Page,
     PercentagePoint,
+    Pixels,
+    PixelsPoint,
     PointSpecifier,
     TextTexture,
 )
@@ -14,7 +16,7 @@ class TitleText(GameObject):
         return self.game.title
 
     def spawn_point(self) -> PointSpecifier:
-        return PercentagePoint(0.50, 0.05)
+        return PixelsPoint(Pixels(400), Pixels(40))
 
     def __init__(self, game: Game) -> None:
         self.game = game
