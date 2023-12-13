@@ -250,11 +250,26 @@ class Theme:
     BACKGROUND: Color
 
 
+class Page:
+    """A page is a self-contained view containing its own set of objects"""
+
+    def __init__(self, game: Game, title: str | None = None) -> None:
+        self.game = game
+        self.objects: list[GameObject] = []
+        self.title = title
+
+    def show(self):
+        if self.title:
+            self.game.set_window_title(self.title)
+        self.game.objects = self.objects
+
+
 class Game:
     def __init__(self, max_fps, theme: Theme, title: str, window_size: Tuple[int, int]):
         # Window display config
         self.theme = theme
         self.background_color = self.theme.BACKGROUND
+        self.title = title
 
         # Initilise the display surface
         self.surface = pygame.display.set_mode(window_size, pygame.RESIZABLE)
@@ -270,11 +285,15 @@ class Game:
         self.key_up_callbacks = {}
         self.is_paused = False
         self.recent_frame_times = deque(maxlen=10)
+        self.page = self.get_initial_page()
 
         # Set up default keybinds
         self.keybinds = {}
 
         pygame.init()
+
+    def get_initial_page(self) -> Page:
+        raise NotImplementedError()
 
     def width(self) -> int:
         """Returns the width of the window, in pixels"""
@@ -292,6 +311,9 @@ class Game:
         y2 = self.height()
 
         return Box(x1, y1, x2, y2)
+
+    def set_window_title(self, title_part: str):
+        pygame.display.set_caption(f"{title_part} - {self.title}")
 
     def on_event(self, event):
         # print(event)
@@ -385,6 +407,8 @@ class Game:
 
     def game_session(self):
         self.initialise_game_session()
+
+        self.page.show()
 
         while not self.exited:
             self.execute_tick()
