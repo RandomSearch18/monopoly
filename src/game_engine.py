@@ -13,10 +13,18 @@ from distutils import core
 
 
 class Corner(Enum):
-    TOP_LEFT = (0, 0)
-    TOP_RIGHT = (1, 0)
-    BOTOM_LEFT = (0, 1)
-    BOTOM_RIGHT = (1, 1)
+    TOP_LEFT = (-1, -1)
+    TOP_RIGHT = (1, -1)
+    BOTTOM_LEFT = (-1, 1)
+    BOTTOM_RIGHT = (1, 1)
+
+
+class Alignment2D(Enum):
+    TOP_LEFT = (-1, -1)
+    TOP_RIGHT = (1, -1)
+    BOTTOM_LEFT = (-1, 1)
+    BOTTOM_RIGHT = (1, 1)
+    CENTER = (0, 0)
 
 
 class Edge(Enum):
@@ -39,7 +47,7 @@ class CoordinateSpecifier:
 
     # 0 would mean the top or left edge of the window (greater pixels value moves right/down);
     # whereas 1 would mean the bottom or right edge of the window (greater pixels value moves left/up)
-    outer_edge: Literal[0, 1]
+    outer_edge: Literal[-1, 1]
     # If the coordinate is part of an object/line, this is the edge of the object/line that the coordinate represents
     # On a line, -1 is the start of the line, 0 is the center, and 1 is the end of the line
     # In an object, -1 is the left/top edge, 0 is the center, and 1 is the right/bottom edge
@@ -59,7 +67,7 @@ class Pixels(CoordinateSpecifier):
     def __init__(
         self,
         pixels: float,
-        outer_edge: Literal[0, 1] = 0,
+        outer_edge: Literal[-1, 1] = -1,
         position: LineEdge | None = None,
     ) -> None:
         self.pixels = pixels
@@ -67,13 +75,12 @@ class Pixels(CoordinateSpecifier):
         self.self_edge = position  # Inner reference point
 
     def move_by(self, pixels: float):
-        pixel_movement = -pixels if self.outer_edge else +pixels
+        pixel_movement = -pixels if self.outer_edge == 1 else +pixels
         self.pixels += pixel_movement
 
     def resolve(self, outer_size: float) -> float:
-        multiplier = self.outer_edge
-        start_from = outer_size if multiplier else 0
-        offset = -self.pixels if multiplier else +self.pixels
+        start_from = outer_size if self.outer_edge == 1 else 0
+        offset = -self.pixels if self.outer_edge == 1 else +self.pixels
         actual_coordinate = start_from + offset
         return actual_coordinate
 
@@ -87,23 +94,17 @@ class Pixels(CoordinateSpecifier):
             # Calculating from center
             absolute_offset = line_length / 2
             multiplier = target_edge
-            print(
-                f"Absolute offset: {absolute_offset} --> {absolute_offset * multiplier}"
-            )
             return absolute_offset * multiplier
 
         # Calculating from an edge
         absolute_offset = line_length
-        return -absolute_offset if self.outer_edge else +absolute_offset
+        return -absolute_offset if self.outer_edge == 1 else +absolute_offset
 
     def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
         resolved_coordinate = self.resolve(outer_size)
         if self.self_edge is None:
             raise RuntimeError("Cannot find edge of a standalone coordinate")
         offset = self.calculate_offest_to_edge(edge, self_length)
-        print(
-            f"Resolved edge {edge} to {resolved_coordinate + offset} with outer_size={outer_size} giving offset={offset}"
-        )
         return resolved_coordinate + offset
 
 
@@ -111,7 +112,7 @@ class Percent(CoordinateSpecifier):
     def __init__(
         self,
         percent: float,
-        outer_edge: Literal[0, 1] = 0,
+        outer_edge: Literal[-1, 1] = -1,
         position: LineEdge | None = None,
     ) -> None:
         self.percent = percent
@@ -161,18 +162,6 @@ class PointSpecifier:
         resolved_y_coordinate = self.y.resolve(game.height())
         return (resolved_x_coordinate, resolved_y_coordinate)
 
-    # def move_right(self, pixels: float):
-    #     self.x.move_by(pixels)
-
-    # def move_left(self, pixels: float):
-    #     self.x.move_by(-pixels)
-
-    # def move_up(self, pixels: float):
-    #     self.y.move_by(-pixels)
-
-    # def move_down(self, pixels: float):
-    #     self.y.move_by(pixels)
-
     def on_window_resize(self, event: Event):
         """Responds to a window resize event to keep the position within window bounds"""
         pass
@@ -184,13 +173,8 @@ class PointSpecifier:
         self, corner: Corner, game: Game, object_width: float, object_height: float
     ):
         corner_x, corner_y = corner.value
-        if corner_x == 0:
-            corner_x = -1
-        if corner_y == 0:
-            corner_y = -1
         target_corner_x = self.x.find_edge(corner_x, game.width(), object_width)
         target_corner_y = self.y.find_edge(corner_y, game.height(), object_height)
-        print(f"Resolved corner {corner} to {target_corner_x}, {target_corner_y}")
         return (target_corner_x, target_corner_y)
 
 
@@ -200,30 +184,16 @@ class PercentagePoint(PointSpecifier):
         x: float,
         y: float,
         outer_corner: Corner = Corner.TOP_LEFT,
-        self_corner: Optional[Corner] = None,
+        self_corner: Optional[Alignment2D] = Alignment2D.CENTER,
     ):
-        self.x = x
-        self.y = y
-        self.outer_corner = outer_corner
-        self.self_corner = self_corner
-        self.object = object
-
-    def resolve(
-        self, game: Game, width: float = 0, height: float = 0
-    ) -> Tuple[float, float]:
-        outer_box = game.window_box()
-        x_pixels = self.x * outer_box.width
-        y_pixels = self.y * outer_box.height
-
-        pixels_point = PointSpecifier(
-            x_pixels, y_pixels, self.outer_corner, self.self_corner
+        outer_corner_x, outer_corner_y = outer_corner.value
+        self_corner_x, self_corner_y = (
+            self_corner.value if self_corner else (None, None)
         )
-        return pixels_point.resolve(game)
-
-    def on_window_resize(self, event):
-        # We don't need to do anything on window resize
-        # since the percentage positions will still be valid
-        pass
+        super().__init__(
+            x=Percent(x, outer_corner_x, self_corner_x),
+            y=Percent(y, outer_corner_y, self_corner_y),
+        )
 
 
 class Box:
