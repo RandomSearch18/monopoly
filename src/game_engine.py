@@ -7,6 +7,7 @@ from typing import Callable, Optional, Tuple
 import pygame
 from pygame import Color
 from pygame.event import Event
+from pygame.font import Font
 
 
 class Corner(Enum):
@@ -244,10 +245,11 @@ class Box:
 
 
 class Theme:
-    """Colors used by the game, labeled according to their purpose"""
+    """Colors and fonts used by the game, labeled according to their purpose"""
 
     FOREGROUND: Color
     BACKGROUND: Color
+    TITLE: Font
 
 
 class Page:
@@ -285,7 +287,6 @@ class Game:
         self.key_up_callbacks = {}
         self.is_paused = False
         self.recent_frame_times = deque(maxlen=10)
-        self.page = self.get_initial_page()
 
         # Set up default keybinds
         self.keybinds = {}
@@ -408,6 +409,7 @@ class Game:
     def game_session(self):
         self.initialise_game_session()
 
+        self.page = self.get_initial_page()
         self.page.show()
 
         while not self.exited:
@@ -489,7 +491,6 @@ class TextTexture(Texture):
         self.game = game
         self._get_content = get_content
         self.font = font
-        self.get_color = get_color or (lambda: self.game.theme.FOREGROUND)
         self.current_rect = self.render_text(0, 0)[1]
         super().__init__(self.width(), self.height())
 
