@@ -9,6 +9,8 @@ from pygame import Color
 from pygame.event import Event
 from pygame.font import Font
 
+from distutils import core
+
 
 class Corner(Enum):
     TOP_LEFT = (0, 0)
@@ -24,40 +26,82 @@ class Edge(Enum):
     RIGHT = (1, 0)
 
 
+# Represents one of the two "ends" of a line, or the center.
+# -1 is the start of the line, 0 is the center, and 1 is the end of the line
+LineEdge = Literal[-1, 0, 1]
+
+
 class CoordinateSpecifier:
     """A specifier for a single coordinate value (either x or y)"""
 
     # 0 would mean the top or left edge of the window (greater pixels value moves right/down);
     # whereas 1 would mean the bottom or right edge of the window (greater pixels value moves left/up)
-    count_from: Literal[0, 1]
+    outer_edge: Literal[0, 1]
+    # If the coordinate is part of an object/line, this is the edge of the object/line that the coordinate represents
+    # On a line, -1 is the start of the line, 0 is the center, and 1 is the end of the line
+    # In an object, -1 is the left/top edge, 0 is the center, and 1 is the right/bottom edge
+    self_edge: LineEdge | None
 
     def resolve(self, outer_size: float) -> float:
         raise NotImplementedError()
 
     def move_by(self, pixels: float):
+        raise NotImplementedError()
+
+    def find_edge(self, edge: LineEdge, outer_size: float, line_length: float) -> float:
         raise NotImplementedError()
 
 
 class Pixels(CoordinateSpecifier):
-    def __init__(self, pixels: float, count_from: Literal[0, 1] = 0) -> None:
+    def __init__(
+        self,
+        pixels: float,
+        measure_from: Literal[0, 1] = 0,
+        measure_to: LineEdge | None = None,
+    ) -> None:
         self.pixels = pixels
-        self.count_from = count_from
+        self.outer_edge = measure_from  # Outer reference point
+        self.self_edge = measure_to  # Inner reference point
 
     def move_by(self, pixels: float):
-        pixel_movement = -pixels if self.count_from else +pixels
+        pixel_movement = -pixels if self.outer_edge else +pixels
         self.pixels += pixel_movement
 
     def resolve(self, outer_size: float) -> float:
-        multiplier = self.count_from
+        multiplier = self.outer_edge
         start_from = outer_size if multiplier else 0
         offset = -self.pixels if multiplier else +self.pixels
         actual_coordinate = start_from + offset
         return actual_coordinate
 
+    def calculate_offest_to_edge(
+        self, target_edge: LineEdge, line_length: float
+    ) -> float:
+        if target_edge == self.self_edge:
+            return 0
+
+        if target_edge == 0:
+            # Calculating from center
+            absolute_offset = line_length / 2
+            return -absolute_offset if self.outer_edge else +absolute_offset
+
+        # Calculating from an edge
+        absolute_offset = line_length
+        return -absolute_offset if self.outer_edge else +absolute_offset
+
+    def find_edge(self, edge: LineEdge, outer_size: float, line_length: float) -> float:
+        resolved_coordinate = self.resolve(outer_size)
+        if self.self_edge is None:
+            raise RuntimeError("Cannot find edge of a standalone coordinate")
+        offset = self.calculate_offest_to_edge(edge, line_length)
+        return resolved_coordinate + offset
+
 
 class PointSpecifier:
     outer_corner: Corner
     self_corner: Optional[Corner]
+    x: CoordinateSpecifier
+    y: CoordinateSpecifier
 
     def resolve(self, game: Game) -> Tuple[float, float]:
         raise NotImplementedError()
@@ -78,44 +122,16 @@ class PointSpecifier:
         """Responds to a window resize event to keep the position within window bounds"""
         pass
 
-    def calculate_offest_to_corner(
-        self, object_width: float, object_height: float, corner_to: Corner
-    ) -> Tuple[float, float]:
-        corner_from = self.self_corner
-
-        if corner_from == corner_to:
-            return (0, 0)
-
-        corner_to_x, corner_to_y = corner_to.value
-        if corner_from is None:
-            # Calculating from center
-            x_multiplier = 1 if corner_to_x == 1 else -1
-            y_multiplier = 1 if corner_to_y == 1 else -1
-            offset_x = (object_width / 2) * x_multiplier
-            offset_y = (object_height / 2) * y_multiplier
-            return (offset_x, offset_y)
-
-        corner_from_x, corner_from_y = corner_from.value
-        x_multiplier = corner_to_x - corner_from_x
-        y_multiplier = corner_to_y - corner_from_y
-        offset_x = object_width * x_multiplier
-        offset_y = object_height * y_multiplier
-
-        return (offset_x, offset_y)
-
     def calculate_top_left(self, game: Game, object_width: float, object_height: float):
         return self.find_corner(Corner.TOP_LEFT, game, object_width, object_height)
 
     def find_corner(
         self, corner: Corner, game: Game, object_width: float, object_height: float
     ):
-        x, y = self.resolve(game)
-        offset_x, offset_y = self.calculate_offest_to_corner(
-            object_width, object_height, corner
-        )
-        top_left_x = x + offset_x
-        top_left_y = y + offset_y
-        return (top_left_x, top_left_y)
+        corner_x, corner_y = corner.value
+        target_corner_x = self.x.find_edge(corner_x, game.width(), object_width)
+        target_corner_y = self.y.find_edge(corner_y, game.height(), object_height)
+        return (target_corner_x, target_corner_y)
 
 
 class PixelsPoint(PointSpecifier):

@@ -16,7 +16,7 @@ class TitleText(GameObject):
         return self.game.title
 
     def spawn_point(self) -> PointSpecifier:
-        return PixelsPoint(Pixels(400), Pixels(40))
+        return PixelsPoint(Pixels(400, measure_to=0), Pixels(5, measure_to=0))
 
     def __init__(self, game: Game) -> None:
         self.game = game
