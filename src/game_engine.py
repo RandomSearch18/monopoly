@@ -246,20 +246,19 @@ class Box:
 class Theme:
     """Colors used by the game, labeled according to their purpose"""
 
-    # TODO Create color palette based on the Monopoly colors
-    FOREGROUND = Color("#000000")
-    BACKGROUND = Color("#cfe2f3")
+    FOREGROUND: Color
+    BACKGROUND: Color
 
 
 class Game:
-    def __init__(self, max_fps):
+    def __init__(self, max_fps, theme: Theme, title: str, window_size: Tuple[int, int]):
         # Window display config
-        self.theme = Theme
+        self.theme = theme
         self.background_color = self.theme.BACKGROUND
 
         # Initilise the display surface
-        self.surface = pygame.display.set_mode((600, 400), pygame.RESIZABLE)
-        pygame.display.set_caption("Mole Abuse")
+        self.surface = pygame.display.set_mode(window_size, pygame.RESIZABLE)
+        pygame.display.set_caption(title)
 
         # Initialise other game components
         self.max_fps = max_fps
@@ -385,6 +384,8 @@ class Game:
         pass
 
     def game_session(self):
+        self.initialise_game_session()
+
         while not self.exited:
             self.execute_tick()
             self.draw_frame()
