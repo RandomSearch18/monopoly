@@ -1,11 +1,14 @@
 from __future__ import annotations
 from game_engine import (
+    CENTER,
+    START,
     Game,
     GameObject,
     Page,
+    Percent,
     PercentagePoint,
     Pixels,
-    PixelsPoint,
+    PointSpecifier,
     PointSpecifier,
     TextTexture,
 )
@@ -16,7 +19,7 @@ class TitleText(GameObject):
         return self.game.title
 
     def spawn_point(self) -> PointSpecifier:
-        return PixelsPoint(Pixels(400, measure_to=0), Pixels(5, measure_to=0))
+        return PointSpecifier(Percent(0.50, position=CENTER), Pixels(5, position=START))
 
     def __init__(self, game: Game) -> None:
         self.game = game
