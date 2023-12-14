@@ -322,7 +322,7 @@ class Page:
         self.objects: list[GameObject] = []
         self.title = title
 
-    def show(self):
+    def activate(self):
         if self.title:
             self.game.set_window_title(self.title)
         self.game.objects = self.objects
@@ -480,7 +480,7 @@ class Game:
         self.initialise_game_session()
 
         self.page = self.get_initial_page()
-        self.page.show()
+        self.page.activate()
 
         while not self.exited:
             self.execute_tick()

@@ -1,6 +1,7 @@
 import pygame
 from game_engine import Fonts, Game, Page, Theme
 from pages.title_screen import TitleScreen
+from pages.token_selection import TokenSelection
 
 from pygame import Color
 from pygame.font import Font
@@ -38,6 +39,7 @@ class Monopoly(Game):
     def __init__(self):
         super().__init__(60, MonopolyTheme(), MonopolyFonts(), "Monopoly", (800, 600))
         self.title_screen = TitleScreen(self)
+        self.token_selection = TokenSelection(self)
 
     def get_initial_page(self):
         return self.title_screen
