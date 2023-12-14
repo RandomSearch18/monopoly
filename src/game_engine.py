@@ -229,12 +229,8 @@ class Box:
 
     def enlarge_by_x(self, pixels: float):
         """Enlarges the box by the provided number of pixels on the left and the right"""
-        # print(
-        #     f"Enlarging box x by {pixels} from {self.x1, self.x2} (width={self.width})"
-        # )
         self.x1 -= pixels
         self.x2 += pixels
-        # print(f"                      to   {self.x1, self.x2} (width={self.width})")
 
     def enlarge_by_y(self, pixels: float):
         """Enlarges the box by the provided number of pixels on the top and the bottom"""
@@ -515,22 +511,6 @@ class PlainColorTexture(Texture):
         )
 
 
-class PlainColorBox:
-    def __init__(self, game: Game, color: Color, box: Box):
-        self.texture = PlainColorTexture(game, color, box.width, box.height)
-        self.box = box
-
-    def draw(self):
-        position = PointSpecifier(
-            Pixels(self.box.left, START, START),
-            Pixels(self.box.top, START, START),
-            outer_corner=Corner.TOP_LEFT,
-            self_corner=Corner.TOP_LEFT,
-        )
-        print(self.texture.width(), self.texture.height())
-        self.texture.draw_at(position)
-
-
 class TextTexture(Texture):
     def width(self) -> float:
         return self.current_outer_box.width
@@ -562,16 +542,13 @@ class TextTexture(Texture):
         text_surface = self.font.render(text_content, use_antialiasing, text_color)
 
         text_rect = text_surface.get_rect()
-        print("Drawing at", start_x, start_y)
         text_rect.left = math.floor(start_x)
         text_rect.top = math.floor(start_y)
 
         padding_x, padding_y = padding
         outer_box = Box.from_rect(text_rect)
-        print("Inner box", outer_box, "from", text_rect)
         outer_box.enlarge_by_x(padding_x)
         outer_box.enlarge_by_y(padding_y)
-        print("Outer box", outer_box)
 
         return text_surface, outer_box, text_rect
 
@@ -740,6 +717,20 @@ class GameObject:
         }
         closest_edge = min(distances, key=distances.get)  # type: ignore
         return closest_edge
+
+    def is_hover(self) -> bool:
+        """Returns True if the object's collision box is being hovered over by the mouse"""
+        mouse_position = pygame.mouse.get_pos()
+        return self.collision_box().intersects_with_point(mouse_position)
+
+    def is_pressed(self) -> bool:
+        """Returns True if the object's collision box is being clicked on"""
+        left_mouse_is_down, _, _ = pygame.mouse.get_pressed()
+        mouse_position = pygame.mouse.get_pos()
+        mouse_is_within_object = self.collision_box().intersects_with_point(
+            mouse_position
+        )
+        return mouse_is_within_object and left_mouse_is_down
 
 
 class Velocity:

@@ -50,12 +50,26 @@ class TitleText2(GameObject):
 
 class ButtonTexture(TextTexture):
     def __init__(
-        self, game: Game, get_content: Callable[[], str | Tuple[str, Color]], font: Font
+        self,
+        game: Game,
+        object: Button,
+        get_content: Callable[[], str | Tuple[str, Color]],
+        font: Font,
+        base_color: Color,
     ):
         super().__init__(game, get_content, font)
+        self.button = object
+        self.base_color = base_color
 
     def get_background_color(self) -> Color | None:
-        return Color("green")
+        # Lighten the color if the button is hovered or pressed
+        hover_color = self.base_color.lerp("white", 0.4)
+        pressed_color = self.base_color.lerp("white", 0.6)
+        if self.button.is_pressed():
+            return pressed_color
+        if self.button.is_hover():
+            return hover_color
+        return self.base_color
 
     def get_padding(self) -> Tuple[float, float]:
         return (50, 10)
@@ -66,7 +80,9 @@ class Button(GameObject):
         self.game = game
         self.label = label
         self.font = font or self.game.fonts.button()
-        self.texture = ButtonTexture(game, self.get_content, self.font)
+        self.texture = ButtonTexture(
+            game, self, self.get_content, self.font, Color("green")
+        )
         super().__init__(self.texture)
 
     def get_content(self):
