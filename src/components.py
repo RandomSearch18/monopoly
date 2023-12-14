@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Callable, Tuple
 
 from pygame import Color
+from pygame.font import Font
 from game_engine import (
     Game,
     GameObject,

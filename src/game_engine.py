@@ -750,27 +750,28 @@ class GameObject:
         return mouse_is_within_object and left_mouse_is_down
 
 
-class Velocity:
-    def on_tick(self):
-        x_movement = self.x
-        y_movement = self.y
+# FIXME Maybe re-implement this if/when we need it
+# class Velocity:
+#     def on_tick(self):
+#         x_movement = self.x
+#         y_movement = self.y
 
-        self.object.position.move_right(x_movement)
-        self.object.position.move_down(y_movement)
+#         self.object.position.move_right(x_movement)
+#         self.object.position.move_down(y_movement)
 
-    def __init__(self, game_object: GameObject, base_speed: float):
-        # Magnitudes of velocity, measured in pixels/tick
-        self.x = 0
-        self.y = 0
+#     def __init__(self, game_object: GameObject, base_speed: float):
+#         # Magnitudes of velocity, measured in pixels/tick
+#         self.x = 0
+#         self.y = 0
 
-        # The speed that the object will travel at by default (pixels/tick)
-        self.base_speed = base_speed
+#         # The speed that the object will travel at by default (pixels/tick)
+#         self.base_speed = base_speed
 
-        self.object = game_object
-        self.object.tick_tasks.append(self.on_tick)
+#         self.object = game_object
+#         self.object.tick_tasks.append(self.on_tick)
 
-    def shove_x(self, multiplier=1.0):
-        self.x = self.base_speed * multiplier
+#     def shove_x(self, multiplier=1.0):
+#         self.x = self.base_speed * multiplier
 
-    def shove_y(self, multiplier=1.0):
-        self.y = self.base_speed * multiplier
+#     def shove_y(self, multiplier=1.0):
+#         self.y = self.base_speed * multiplier
