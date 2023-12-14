@@ -554,13 +554,11 @@ class TextTexture(Texture):
 
         padding_x, padding_y = padding
         outer_box = Box.from_rect(text_rect)
-        # print(f"Outer box form {outer_box}")
+        print("Inner box", outer_box)
         outer_box.enlarge_by_x(padding_x)
         outer_box.enlarge_by_y(padding_y)
-        # print(f"           to  {outer_box}")
+        print("Outer box", outer_box)
 
-        print(outer_box, text_rect)
-        print("Outer box", outer_box.width, outer_box.height)
         return text_surface, outer_box, text_rect
 
     def get_dummy_rect(self):
@@ -588,6 +586,8 @@ class TextTexture(Texture):
         start_x, start_y = position.calculate_top_left(
             self.game, self.width(), self.height()
         )
+        print(f"Center = {position.resolve(self.game)}")
+        print(f"Top-left  = {start_x, start_y}")
         padding = self.get_padding()
         text_surface, outer_box, text_rect = self.render_text(start_x, start_y, padding)
         self.current_box = outer_box
