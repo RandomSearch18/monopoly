@@ -229,8 +229,12 @@ class Box:
 
     def enlarge_by_x(self, pixels: float):
         """Enlarges the box by the provided number of pixels on the left and the right"""
+        # print(
+        #     f"Enlarging box x by {pixels} from {self.x1, self.x2} (width={self.width})"
+        # )
         self.x1 -= pixels
         self.x2 += pixels
+        # print(f"                      to   {self.x1, self.x2} (width={self.width})")
 
     def enlarge_by_y(self, pixels: float):
         """Enlarges the box by the provided number of pixels on the top and the bottom"""
@@ -269,6 +273,9 @@ class Box:
         is_outside_y = self.bottom < other_box.top or self.top > other_box.bottom
 
         return is_outside_x or is_outside_y
+
+    def to_rect(self) -> Rect:
+        return Rect(self.left, self.top, self.width, self.height)
 
     def __str__(self) -> str:
         return f"Box<({self.x1}, {self.y1}) ({self.x2}, {self.y2})>"
@@ -526,10 +533,16 @@ class PlainColorBox:
 
 class TextTexture(Texture):
     def width(self) -> float:
-        return self.current_box.width
+        return self.current_outer_box.width
 
     def height(self) -> float:
-        return self.current_box.height
+        return self.current_outer_box.height
+
+    def inner_width(self) -> float:
+        return self.current_text_rect.width
+
+    def inner_height(self) -> float:
+        return self.current_text_rect.height
 
     def get_content(self):
         provided_content = self._get_content()
@@ -549,20 +562,22 @@ class TextTexture(Texture):
         text_surface = self.font.render(text_content, use_antialiasing, text_color)
 
         text_rect = text_surface.get_rect()
+        print("Drawing at", start_x, start_y)
         text_rect.left = math.floor(start_x)
         text_rect.top = math.floor(start_y)
 
         padding_x, padding_y = padding
         outer_box = Box.from_rect(text_rect)
-        print("Inner box", outer_box)
+        print("Inner box", outer_box, "from", text_rect)
         outer_box.enlarge_by_x(padding_x)
         outer_box.enlarge_by_y(padding_y)
         print("Outer box", outer_box)
 
         return text_surface, outer_box, text_rect
 
-    def get_dummy_rect(self):
-        return self.render_text(0, 0, self.get_padding())[1]
+    def get_dummy_bounding_boxes(self):
+        _, outer_box, text_rect = self.render_text(0, 0, self.get_padding())
+        return outer_box, text_rect
 
     def __init__(
         self,
@@ -573,7 +588,7 @@ class TextTexture(Texture):
         self.game = game
         self._get_content = get_content
         self.font = font
-        self.current_box = self.get_dummy_rect()
+        self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
         super().__init__(self.width(), self.height())
 
     def get_background_color(self) -> Color | None:
@@ -584,17 +599,15 @@ class TextTexture(Texture):
 
     def draw_at(self, position: PointSpecifier):
         start_x, start_y = position.calculate_top_left(
-            self.game, self.width(), self.height()
+            self.game, self.inner_width(), self.inner_height()
         )
-        print(f"Center = {position.resolve(self.game)}")
-        print(f"Top-left  = {start_x, start_y}")
         padding = self.get_padding()
         text_surface, outer_box, text_rect = self.render_text(start_x, start_y, padding)
-        self.current_box = outer_box
+        self.current_outer_box = outer_box
+        self.current_text_rect = text_rect
         background = self.get_background_color()
         if background:
-            self.background = PlainColorBox(self.game, background, outer_box)
-            self.background.draw()
+            pygame.draw.rect(self.game.surface, background, outer_box.to_rect())
         self.game.surface.blit(text_surface, text_rect)
 
 
