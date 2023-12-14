@@ -5,6 +5,8 @@ from pygame import Color
 from game_engine import (
     CENTER,
     START,
+    BelowObject,
+    Corner,
     Game,
     GameObject,
     Page,
@@ -14,7 +16,6 @@ from game_engine import (
     PointSpecifier,
     PointSpecifier,
     TextTexture,
-    Texture,
 )
 
 from pygame.font import Font
@@ -39,10 +40,11 @@ class TitleText2(GameObject):
         return "Game other title"
 
     def spawn_point(self) -> PointSpecifier:
-        return PercentagePoint(0.5, 0.5)
+        return self.spawn_at
 
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: Game, spawn_at: PointSpecifier) -> None:
         self.game = game
+        self.spawn_at = spawn_at
         super().__init__(
             texture=TextTexture(game, self.get_content, self.game.fonts.title())
         )
@@ -97,4 +99,15 @@ class TitleScreen(Page):
         super().__init__(game, "Title screen")
         self.title_text = TitleText(game)
 
-        self.objects.extend([self.title_text, TitleText2(game), Button(game, "Start")])
+        self.objects.extend(
+            [
+                self.title_text,
+                TitleText2(
+                    game,
+                    PointSpecifier(
+                        Percent(0.5, position=CENTER), BelowObject(self.title_text, 5)
+                    ),
+                ),
+                Button(game, "Start"),
+            ]
+        )

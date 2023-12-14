@@ -59,6 +59,22 @@ class CoordinateSpecifier:
     # def move_by(self, pixels: float):
     #     raise NotImplementedError()
 
+    def calculate_offest_to_edge(
+        self, target_edge: LineEdge, line_length: float
+    ) -> float:
+        if target_edge == self.self_edge:
+            return 0
+
+        if self.self_edge == 0:
+            # Calculating from center
+            absolute_offset = line_length / 2
+            multiplier = target_edge
+            return absolute_offset * multiplier
+
+        # Calculating from an edge
+        absolute_offset = line_length
+        return -absolute_offset if self.outer_edge == 1 else +absolute_offset
+
     def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
         raise NotImplementedError()
 
@@ -84,22 +100,6 @@ class Pixels(CoordinateSpecifier):
         actual_coordinate = start_from + offset
         return actual_coordinate
 
-    def calculate_offest_to_edge(
-        self, target_edge: LineEdge, line_length: float
-    ) -> float:
-        if target_edge == self.self_edge:
-            return 0
-
-        if self.self_edge == 0:
-            # Calculating from center
-            absolute_offset = line_length / 2
-            multiplier = target_edge
-            return absolute_offset * multiplier
-
-        # Calculating from an edge
-        absolute_offset = line_length
-        return -absolute_offset if self.outer_edge == 1 else +absolute_offset
-
     def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
         resolved_coordinate = self.resolve(outer_size)
         if self.self_edge is None:
@@ -120,12 +120,6 @@ class Percent(CoordinateSpecifier):
         self.self_edge = position  # Inner reference point
 
     def resolve(self, outer_size: float) -> float:
-        # multiplier = self.outer_edge
-        # start_from = outer_size if multiplier else 0
-        # absolute_offset = self.percent * outer_size
-        # offset = -absolute_offset if multiplier else +absolute_offset
-        # actual_coordinate = start_from + offset
-        # return actual_coordinate
         pixels_specifier = Pixels(
             self.percent * outer_size, self.outer_edge, self.self_edge
         )
@@ -142,6 +136,27 @@ class Percent(CoordinateSpecifier):
             self.percent * outer_size, self.outer_edge, self.self_edge
         )
         return pixels_specifier.find_edge(edge, outer_size, self_length)
+
+
+class BelowObject(CoordinateSpecifier):
+    def __init__(self, leader_object: GameObject, gap_pixels: float = 0) -> None:
+        self.leader_object = leader_object
+        self.gap_pixels = gap_pixels
+        self.self_edge = START
+
+    def resolve(self, outer_size: float) -> float:
+        leader_position = self.leader_object.current_coordinates
+        if not leader_position:
+            raise RuntimeError(
+                "Can't render an object relative to an object that hasn't been rendered yet"
+            )
+        leader_bottom = leader_position[1] + self.leader_object.height()
+        return leader_bottom + self.gap_pixels
+
+    def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
+        resolved_coordinate = self.resolve(outer_size)
+        offset = self.calculate_offest_to_edge(edge, self_length)
+        return resolved_coordinate + offset
 
 
 class PointSpecifier:
@@ -632,9 +647,11 @@ class GameObject:
         self.texture = texture
         self.is_solid = solid
         self.spawned_at = pygame.time.get_ticks()
+        self.current_coordinates: Tuple[float, float] | None = None
         self.reset()
 
     def draw(self):
+        self.current_coordinates = self.position.resolve(self.game)
         self.texture.draw_at(self.position)
 
     def run_tick_tasks(self):
