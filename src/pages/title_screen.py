@@ -57,6 +57,9 @@ class ButtonTexture(TextTexture):
     def get_background_color(self) -> Color | None:
         return Color("green")
 
+    def get_padding(self) -> Tuple[float, float]:
+        return (50, 10)
+
 
 class Button(GameObject):
     def __init__(self, game: Game, label: str, font: Font | None = None):
