@@ -26,20 +26,6 @@ class TitleText(GameObject):
         return self.game.title
 
     def spawn_point(self) -> PointSpecifier:
-        return PointSpecifier(Percent(0.50, position=CENTER), Pixels(5, position=START))
-
-    def __init__(self, game: Game) -> None:
-        self.game = game
-        super().__init__(
-            texture=TextTexture(game, self.get_content, self.game.fonts.title())
-        )
-
-
-class TitleText2(GameObject):
-    def get_content(self):
-        return "Game other title"
-
-    def spawn_point(self) -> PointSpecifier:
         return self.spawn_at
 
     def __init__(self, game: Game, spawn_at: PointSpecifier) -> None:
@@ -78,36 +64,49 @@ class ButtonTexture(TextTexture):
 
 
 class Button(GameObject):
-    def __init__(self, game: Game, label: str, font: Font | None = None):
+    def __init__(
+        self,
+        game: Game,
+        label: str,
+        callback: Callable,
+        spawn_at: PointSpecifier,
+        font: Font | None = None,
+    ):
         self.game = game
         self.label = label
+        self.callback = callback
+        self.spawn_at = spawn_at
         self.font = font or self.game.fonts.button()
         self.texture = ButtonTexture(
             game, self, self.get_content, self.font, Color("green")
         )
         super().__init__(self.texture)
+        self.on_click_tasks.append(self.run_callback)
+
+    def run_callback(self, _):
+        self.callback()
 
     def get_content(self):
         return self.label
 
     def spawn_point(self) -> PointSpecifier:
-        return PercentagePoint(0.5, 0.75)
+        return self.spawn_at
 
 
 class TitleScreen(Page):
     def __init__(self, game: Game) -> None:
         super().__init__(game, "Title screen")
-        self.title_text = TitleText(game)
+        title_position = PointSpecifier(
+            Percent(0.50, position=CENTER), Pixels(5, position=START)
+        )
+        self.title_text = TitleText(game, title_position)
+        self.start_button = Button(
+            game, "Start", lambda: print("Start"), PercentagePoint(0.5, 0.25)
+        )
 
         self.objects.extend(
             [
                 self.title_text,
-                TitleText2(
-                    game,
-                    PointSpecifier(
-                        Percent(0.5, position=CENTER), BelowObject(self.title_text, 5)
-                    ),
-                ),
-                Button(game, "Start"),
+                self.start_button,
             ]
         )
