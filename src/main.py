@@ -1,5 +1,5 @@
 import pygame
-from game_engine import Game, Page, Theme
+from game_engine import Fonts, Game, Page, Theme
 from pages.title_screen import TitleScreen
 
 from pygame import Color
@@ -12,12 +12,31 @@ class MonopolyTheme(Theme):
     # TODO Create color palette based on the Monopoly colors
     FOREGROUND = Color("black")
     BACKGROUND = Color("white")
-    TITLE = Font(None, 64)
+
+
+class MonopolyFonts(Fonts):
+    def base_font_size(self):
+        return 16
+
+    def size_miltiplier(self, multiplier: float) -> int:
+        return int(self.base_font_size() * multiplier)
+
+    def system_font(self, size_multiplier: float):
+        return Font(None, self.size_miltiplier(size_multiplier))
+
+    def title(self) -> Font:
+        return self.system_font(4)
+
+    def body(self) -> Font:
+        return self.system_font(1)
+
+    def button(self) -> Font:
+        return self.system_font(2)
 
 
 class Monopoly(Game):
     def __init__(self):
-        super().__init__(60, MonopolyTheme(), "Monopoly", (800, 600))
+        super().__init__(60, MonopolyTheme(), MonopolyFonts(), "Monopoly", (800, 600))
         self.title_screen = TitleScreen(self)
 
     def get_initial_page(self):

@@ -261,7 +261,17 @@ class Theme:
 
     FOREGROUND: Color
     BACKGROUND: Color
-    TITLE: Font
+
+
+class Fonts:
+    def title(self) -> Font:
+        raise NotImplementedError()
+
+    def body(self) -> Font:
+        raise NotImplementedError()
+
+    def button(self) -> Font:
+        raise NotImplementedError()
 
 
 class Page:
@@ -279,9 +289,17 @@ class Page:
 
 
 class Game:
-    def __init__(self, max_fps, theme: Theme, title: str, window_size: Tuple[int, int]):
+    def __init__(
+        self,
+        max_fps,
+        theme: Theme,
+        fonts: Fonts,
+        title: str,
+        window_size: Tuple[int, int],
+    ):
         # Window display config
         self.theme = theme
+        self.fonts = fonts
         self.background_color = self.theme.BACKGROUND
         self.title = title
 
@@ -448,7 +466,7 @@ class Texture:
     def width(self) -> float:
         return self.base_width
 
-    def draw_at(self, top_left: PointSpecifier):
+    def draw_at(self, position: PointSpecifier):
         pass
 
 
@@ -481,11 +499,13 @@ class TextTexture(Texture):
             return (provided_content, self.game.theme.FOREGROUND)
         return provided_content
 
-    def render_text(self, start_x: float, start_y: float):
+    def render_text(self, start_x: float, start_y: float, background: Color | None):
         """Computes a surface and bounding rect for the text, but doesn't draw it to the screen"""
         text_content, text_color = self.get_content()
         use_antialiasing = True
-        text_surface = self.font.render(text_content, use_antialiasing, text_color)
+        text_surface = self.font.render(
+            text_content, use_antialiasing, text_color, background
+        )
 
         text_rect = text_surface.get_rect()
         text_rect.left = math.floor(start_x)
@@ -502,14 +522,19 @@ class TextTexture(Texture):
         self.game = game
         self._get_content = get_content
         self.font = font
-        self.current_rect = self.render_text(0, 0)[1]
+        self.current_rect = self.render_text(0, 0, None)[1]
         super().__init__(self.width(), self.height())
+
+    def get_background_color(self) -> Color | None:
+        return None
 
     def draw_at(self, position: PointSpecifier):
         start_x, start_y = position.calculate_top_left(
             self.game, self.width(), self.height()
         )
-        text_surface, text_rect = self.render_text(start_x, start_y)
+        text_surface, text_rect = self.render_text(
+            start_x, start_y, self.get_background_color()
+        )
         self.current_rect = text_rect
         self.game.surface.blit(text_surface, text_rect)
 
@@ -561,7 +586,7 @@ class GameObject:
         self.reset()
 
     def draw(self):
-        raise NotImplementedError()
+        self.texture.draw_at(self.position)
 
     def run_tick_tasks(self):
         for callback in self.tick_tasks:
