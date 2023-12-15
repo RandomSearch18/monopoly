@@ -3,7 +3,7 @@ import math
 from collections import deque
 from enum import Enum
 
-from typing import Callable, Literal, Optional, Tuple
+from typing import Callable, Generic, Literal, Optional, Tuple, TypeVar
 import pygame
 from pygame import Color
 from pygame.rect import Rect
@@ -620,7 +620,11 @@ class ImageTexture(Texture):
         )
         self.game.surface.blit(self.image, (start_x, start_y))
 
-class GameObject:
+
+T = TypeVar("T", bound=Game)
+
+
+class GameObject(Generic[T]):
     def height(self) -> float:
         return self.texture.height()
 
@@ -637,12 +641,13 @@ class GameObject:
 
     def __init__(
         self,
+        game: T,
         texture: Texture,
         solid=True,
     ):
-        assert hasattr(self, "game")
-        assert isinstance(self.game, Game)
-        self.game: Game = self.game
+        # assert hasattr(self, "game")
+        # assert isinstance(self.game, Game)
+        self.game: T = game
         self.tick_tasks: list[Callable] = []
         self.on_click_tasks: list[Callable[[Event], None]] = []
         self.texture = texture

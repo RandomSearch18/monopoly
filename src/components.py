@@ -1,10 +1,9 @@
 from __future__ import annotations
-from typing import Callable, Tuple
+from typing import TYPE_CHECKING, Callable, Tuple
 
 from pygame import Color
 from pygame.font import Font
 from game_engine import (
-    Game,
     GameObject,
     PercentagePoint,
     PlainColorTexture,
@@ -13,22 +12,26 @@ from game_engine import (
     TextTexture,
 )
 
+if TYPE_CHECKING:
+    from main import Monopoly
 
-class Container(GameObject):
+
+class Container(GameObject[Monopoly]):
     """Used for easy placement of multiple objects in a single row/column"""
 
     def __init__(
         self,
-        game: Game,
+        game: Monopoly,
         spawn_at: PointSpecifier,
         size: tuple[float, float],
         color: Color | None = None,
     ) -> None:
-        self.game = game
+        # self.game = game
         texture = PlainColorTexture(game, color, *size)
-        super().__init__(texture)
+        super().__init__(game, texture)
         self.children: list[GameObject] = []
         self.spawn_at = spawn_at
+        self.game  # (variable) game: T@__init__
 
     def spawn_point(self) -> PointSpecifier:
         return self.spawn_at
@@ -46,7 +49,7 @@ class Container(GameObject):
 
 
 class Header(Container):
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: Monopoly) -> None:
         spawn_at = PercentagePoint(0, 0)
         super().__init__(game, spawn_at, (game.width(), 50))
 
@@ -56,19 +59,19 @@ class Text(GameObject):
         return self.spawn_at
 
     def __init__(
-        self, game: Game, get_content: Callable[[], str], spawn_at: PointSpecifier
+        self, game: Monopoly, get_content: Callable[[], str], spawn_at: PointSpecifier
     ) -> None:
-        self.game = game
+        # self.game = game
         self.spawn_at = spawn_at
         super().__init__(
-            texture=TextTexture(game, get_content, self.game.fonts.title())
+            game=game, texture=TextTexture(game, get_content, game.fonts.title())
         )
 
 
 class ButtonTexture(TextTexture):
     def __init__(
         self,
-        game: Game,
+        game: Monopoly,
         object: Button,
         get_content: Callable[[], str | Tuple[str, Color]],
         font: Font,
@@ -95,21 +98,21 @@ class ButtonTexture(TextTexture):
 class Button(GameObject):
     def __init__(
         self,
-        game: Game,
+        game: Monopoly,
         label: str,
         callback: Callable,
         spawn_at: PointSpecifier,
         font: Font | None = None,
     ):
-        self.game = game
+        # self.game = game
         self.label = label
         self.callback = callback
         self.spawn_at = spawn_at
-        self.font = font or self.game.fonts.button()
+        self.font = font or game.fonts.button()
         self.texture = ButtonTexture(
             game, self, self.get_content, self.font, Color("green")
         )
-        super().__init__(self.texture)
+        super().__init__(game, self.texture)
         self.on_click_tasks.append(self.run_callback)
 
     def run_callback(self, _):

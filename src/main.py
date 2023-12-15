@@ -13,6 +13,7 @@ class MonopolyTheme(Theme):
     # TODO Create color palette based on the Monopoly colors
     FOREGROUND = Color("black")
     BACKGROUND = Color("white")
+    AA = 1
 
 
 class MonopolyFonts(Fonts):
@@ -36,6 +37,8 @@ class MonopolyFonts(Fonts):
 
 
 class Monopoly(Game):
+    theme: MonopolyTheme
+
     def __init__(self):
         super().__init__(60, MonopolyTheme(), MonopolyFonts(), "Monopoly", (800, 600))
         self.title_screen = TitleScreen(self)
