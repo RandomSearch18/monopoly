@@ -619,6 +619,14 @@ class ImageTexture(Texture):
         self.game.surface.blit(self.image, (start_x, start_y))
 
 
+class NoTexture(Texture):
+    def __init__(self, width: float, height: float):
+        super().__init__(width, height)
+
+    def draw_at(self, _):
+        pass
+
+
 class GameObject:
     def height(self) -> float:
         return self.texture.height()

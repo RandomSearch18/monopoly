@@ -1,4 +1,5 @@
 from __future__ import annotations
+from pty import spawn
 from typing import Callable, Tuple
 
 from pygame import Color
@@ -6,10 +7,50 @@ from pygame.font import Font
 from game_engine import (
     Game,
     GameObject,
+    NoTexture,
+    PercentagePoint,
+    PlainColorTexture,
     PointSpecifier,
     PointSpecifier,
     TextTexture,
 )
+
+
+class Container(GameObject):
+    """Used for easy placement of multiple objects in a single row/column"""
+
+    def __init__(
+        self,
+        game: Game,
+        spawn_at: PointSpecifier,
+        size: tuple[float, float],
+        color: Color | None = None,
+    ) -> None:
+        self.game = game
+        texture = PlainColorTexture(game, color, *size) if color else NoTexture()
+        super().__init__()
+        self.children: list[GameObject] = []
+        self.spawn_at = spawn_at
+
+    def spawn_point(self) -> PointSpecifier:
+        return self.spawn_at
+
+    def draw(self):
+        super().draw()
+        for child in self.children:
+            child.draw()
+
+    def add_child(self, object: GameObject):
+        self.children.append(object)
+
+    def add_children(self, *objects: GameObject):
+        self.children.extend(objects)
+
+
+class Header(Container):
+    def __init__(self, game: Game) -> None:
+        spawn_at = PercentagePoint(0, 0)
+        super().__init__(game, spawn_at, (game.width(), 50))
 
 
 class Text(GameObject):
