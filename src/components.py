@@ -55,7 +55,10 @@ class Header(Container):
         super().__init__(
             game, spawn_at, (game.width(), 50), game.theme.HEADER_BACKGROUND
         )
-        self.add_child(Text(game, self.get_title_text, spawn_at))
+        self.page_title_object = Text(
+            game, self.get_title_text, spawn_at, color=game.theme.HEADER_FOREGROUND
+        )
+        self.add_child(self.page_title_object)
 
     def get_title_text(self) -> str:
         active_page = self.game.active_page
@@ -73,13 +76,14 @@ class Text(GameObject):
         game: Monopoly,
         get_content: Callable[[], str],
         spawn_at: PointSpecifier,
+        color: Color | None = None,
         padding: tuple[float, float] = (0, 0),
     ) -> None:
         # self.game = game
         self.spawn_at = spawn_at
         super().__init__(
             game=game,
-            texture=TextTexture(game, get_content, game.fonts.title(), padding),
+            texture=TextTexture(game, get_content, game.fonts.title(), color, padding),
         )
 
 

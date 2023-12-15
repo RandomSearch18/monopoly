@@ -357,7 +357,7 @@ class Game:
         self.key_up_callbacks = {}
         self.is_paused = False
         self.recent_frame_times = deque(maxlen=10)
-        self.active_page = None
+        self.active_page: Page | None = None
 
         # Set up default keybinds
         self.keybinds = {}
@@ -544,7 +544,8 @@ class TextTexture(Texture):
     def get_content(self):
         provided_content = self._get_content()
         if isinstance(provided_content, str):
-            return (provided_content, self.game.theme.FOREGROUND)
+            default_color = self.default_color or self.game.theme.FOREGROUND
+            return (provided_content, default_color)
         return provided_content
 
     def render_text(
@@ -578,12 +579,14 @@ class TextTexture(Texture):
         game: Game,
         get_content: Callable[[], str | Tuple[str, Color]],
         font: pygame.font.Font,
+        default_color: Color | None = None,
         padding: Tuple[float, float] = (0, 0),
     ):
         self.game = game
         self._get_content = get_content
         self.font = font
         self._padding = padding
+        self.default_color = default_color
         self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
         super().__init__(self.width(), self.height())
 
