@@ -1,5 +1,4 @@
 from __future__ import annotations
-from pty import spawn
 from typing import Callable, Tuple
 
 from pygame import Color
