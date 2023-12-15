@@ -50,17 +50,20 @@ class Container(GameObject["Monopoly"]):
 
 
 class Header(Container):
-    def __init__(self, game: Monopoly) -> None:
+    def __init__(self, game: Monopoly, override_page_title: str | None = None) -> None:
         spawn_at = PercentagePoint(0, 0, self_corner=Alignment2D.TOP_LEFT)
         super().__init__(
-            game, spawn_at, (game.width(), 50), game.theme.HEADER_BACKGROUND
+            game, spawn_at, (game.width(), 60), game.theme.HEADER_BACKGROUND
         )
+        self.override_page_title = override_page_title
         self.page_title_object = Text(
             game, self.get_title_text, spawn_at, color=game.theme.HEADER_FOREGROUND
         )
         self.add_child(self.page_title_object)
 
     def get_title_text(self) -> str:
+        if self.override_page_title:
+            return self.override_page_title
         active_page = self.game.active_page
         if active_page:
             return active_page.title

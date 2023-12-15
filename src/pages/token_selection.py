@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class TokenSelection(Page):
     def __init__(self, game: Monopoly) -> None:
-        super().__init__(game, "Selecting tokens")
+        super().__init__(game, "Token selection")
         title_position = PointSpecifier(
             Pixels(5, position=START), Pixels(5, position=START)
         )

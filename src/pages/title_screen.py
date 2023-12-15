@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from components import Button, Text
+from components import Button, Header, Text
 
 from game_engine import (
     CENTER,
@@ -21,10 +21,7 @@ if TYPE_CHECKING:
 class TitleScreen(Page):
     def __init__(self, game: Monopoly) -> None:
         super().__init__(game, "Title screen")
-        title_position = PointSpecifier(
-            Percent(0.50, position=CENTER), Pixels(5, position=START)
-        )
-        self.title_text = Text(game, lambda: self.game.title, title_position)
+        self.page_header = Header(game, "Welcome to Monopoly")
         self.start_button = Button(
             game,
             "Start",
@@ -34,7 +31,7 @@ class TitleScreen(Page):
 
         self.objects.extend(
             [
-                self.title_text,
+                self.page_header,
                 self.start_button,
             ]
         )
