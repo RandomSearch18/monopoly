@@ -6,7 +6,6 @@ from pygame.font import Font
 from game_engine import (
     Game,
     GameObject,
-    NoTexture,
     PercentagePoint,
     PlainColorTexture,
     PointSpecifier,
@@ -26,8 +25,8 @@ class Container(GameObject):
         color: Color | None = None,
     ) -> None:
         self.game = game
-        texture = PlainColorTexture(game, color, *size) if color else NoTexture()
-        super().__init__()
+        texture = PlainColorTexture(game, color, *size)
+        super().__init__(texture)
         self.children: list[GameObject] = []
         self.spawn_at = spawn_at
 
