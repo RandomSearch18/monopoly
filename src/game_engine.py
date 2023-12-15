@@ -5,11 +5,10 @@ from enum import Enum
 
 from typing import Callable, Literal, Optional, Tuple
 import pygame
-from pygame import Color, Rect
+from pygame import Color
+from pygame.rect import Rect
 from pygame.event import Event
 from pygame.font import Font
-
-from distutils import core
 
 
 class Corner(Enum):
@@ -511,18 +510,21 @@ class Texture:
 
 
 class PlainColorTexture(Texture):
-    def __init__(self, game: Game, color: Color, width, height):
+    def __init__(self, game: Game, color: Color | None, width, height):
         self.game = game
         self.color = color
         super().__init__(width, height)
 
     def draw_at(self, position: PointSpecifier):
+        if not self.color:
+            return
+
         x1, y1 = position.calculate_top_left(self.game, self.width(), self.height())
 
         pygame.draw.rect(
             self.game.surface,
             self.color,
-            [x1, y1, self.width(), self.height()],
+            Rect(x1, y1, self.width(), self.height()),
         )
 
 
