@@ -13,7 +13,7 @@ class MonopolyTheme(Theme):
     # TODO Create color palette based on the Monopoly colors
     FOREGROUND = Color("black")
     BACKGROUND = Color("white")
-    AA = 1
+    HEADER_BACKGROUND = Color("red")
 
 
 class MonopolyFonts(Fonts):

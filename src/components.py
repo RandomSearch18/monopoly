@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Callable, Tuple
 from pygame import Color
 from pygame.font import Font
 from game_engine import (
+    Alignment2D,
     GameObject,
     PercentagePoint,
     PlainColorTexture,
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
     from main import Monopoly
 
 
-class Container(GameObject[Monopoly]):
+class Container(GameObject["Monopoly"]):
     """Used for easy placement of multiple objects in a single row/column"""
 
     def __init__(
@@ -28,9 +29,9 @@ class Container(GameObject[Monopoly]):
     ) -> None:
         # self.game = game
         texture = PlainColorTexture(game, color, *size)
+        self.spawn_at = spawn_at
         super().__init__(game, texture)
         self.children: list[GameObject] = []
-        self.spawn_at = spawn_at
         self.game  # (variable) game: T@__init__
 
     def spawn_point(self) -> PointSpecifier:
@@ -50,8 +51,17 @@ class Container(GameObject[Monopoly]):
 
 class Header(Container):
     def __init__(self, game: Monopoly) -> None:
-        spawn_at = PercentagePoint(0, 0)
-        super().__init__(game, spawn_at, (game.width(), 50))
+        spawn_at = PercentagePoint(0, 0, self_corner=Alignment2D.TOP_LEFT)
+        super().__init__(
+            game, spawn_at, (game.width(), 50), game.theme.HEADER_BACKGROUND
+        )
+        self.add_child(Text(game, self.get_title_text, spawn_at))
+
+    def get_title_text(self) -> str:
+        active_page = self.game.active_page
+        if active_page:
+            return active_page.title
+        return "Loading"
 
 
 class Text(GameObject):
@@ -59,12 +69,17 @@ class Text(GameObject):
         return self.spawn_at
 
     def __init__(
-        self, game: Monopoly, get_content: Callable[[], str], spawn_at: PointSpecifier
+        self,
+        game: Monopoly,
+        get_content: Callable[[], str],
+        spawn_at: PointSpecifier,
+        padding: tuple[float, float] = (0, 0),
     ) -> None:
         # self.game = game
         self.spawn_at = spawn_at
         super().__init__(
-            game=game, texture=TextTexture(game, get_content, game.fonts.title())
+            game=game,
+            texture=TextTexture(game, get_content, game.fonts.title(), padding),
         )
 
 

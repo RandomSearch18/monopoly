@@ -316,7 +316,7 @@ class Fonts:
 class Page:
     """A page is a self-contained view containing its own set of objects"""
 
-    def __init__(self, game: Game, title: str | None = None) -> None:
+    def __init__(self, game: Game, title: str) -> None:
         self.game = game
         self.objects: list[GameObject] = []
         self.title = title
@@ -324,6 +324,7 @@ class Page:
     def activate(self):
         if self.title:
             self.game.set_window_title(self.title)
+        self.game.active_page = self
         self.game.objects = self.objects
 
 
@@ -356,6 +357,7 @@ class Game:
         self.key_up_callbacks = {}
         self.is_paused = False
         self.recent_frame_times = deque(maxlen=10)
+        self.active_page = None
 
         # Set up default keybinds
         self.keybinds = {}
@@ -477,9 +479,7 @@ class Game:
 
     def game_session(self):
         self.initialise_game_session()
-
-        self.page = self.get_initial_page()
-        self.page.activate()
+        self.get_initial_page().activate()
 
         while not self.exited:
             self.execute_tick()
@@ -578,10 +578,12 @@ class TextTexture(Texture):
         game: Game,
         get_content: Callable[[], str | Tuple[str, Color]],
         font: pygame.font.Font,
+        padding: Tuple[float, float] = (0, 0),
     ):
         self.game = game
         self._get_content = get_content
         self.font = font
+        self._padding = padding
         self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
         super().__init__(self.width(), self.height())
 
@@ -589,7 +591,7 @@ class TextTexture(Texture):
         return None
 
     def get_padding(self) -> Tuple[float, float]:
-        return (0, 0)
+        return self._padding
 
     def draw_at(self, position: PointSpecifier):
         start_x, start_y = position.calculate_top_left(
