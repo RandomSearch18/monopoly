@@ -4,9 +4,13 @@ from typing import TYPE_CHECKING, Callable, Tuple
 from pygame import Color
 from pygame.font import Font
 from game_engine import (
+    CENTER,
+    START,
     Alignment2D,
+    Corner,
     GameObject,
     PercentagePoint,
+    Pixels,
     PlainColorTexture,
     PointSpecifier,
     PointSpecifier,
@@ -50,14 +54,24 @@ class Container(GameObject["Monopoly"]):
 
 
 class Header(Container):
-    def __init__(self, game: Monopoly, override_page_title: str | None = None) -> None:
+    def __init__(self, game: Monopoly, page_title: str | None = None) -> None:
+        HEADER_HEIGHT = 60
+        align_to_middle = Pixels(HEADER_HEIGHT / 2, position=CENTER)
         spawn_at = PercentagePoint(0, 0, self_corner=Alignment2D.TOP_LEFT)
         super().__init__(
-            game, spawn_at, (game.width(), 60), game.theme.HEADER_BACKGROUND
+            game, spawn_at, (game.width(), HEADER_HEIGHT), game.theme.HEADER_BACKGROUND
         )
-        self.override_page_title = override_page_title
+        self.override_page_title = page_title
+
+        # PAGE TITLE
+        page_title_position = PointSpecifier(
+            Pixels(0, position=START), align_to_middle, self_corner=Corner.TOP_LEFT
+        )
         self.page_title_object = Text(
-            game, self.get_title_text, spawn_at, color=game.theme.HEADER_FOREGROUND
+            game,
+            self.get_title_text,
+            page_title_position,
+            color=game.theme.HEADER_FOREGROUND,
         )
         self.add_child(self.page_title_object)
 
