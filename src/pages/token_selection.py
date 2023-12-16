@@ -34,24 +34,38 @@ class PlayerList(Container):
         height = self.page.get_content_height()
         return width, height
 
-    def show_add_player_ui(self):
-        print("Add player UI")
+    def add_new_player(self):
+        print("New player button clicked")
+        current_game = self.game.current_game
+        assert current_game
+        initial_token = current_game.get_next_unused_token()
+        current_game.players.append(Player(nickname="New player", token=initial_token))
 
     def update_children(self):
         current_game = self.game.current_game
         assert current_game
-        self.clear_children()
+        existing_player_items = [
+            child for child in self.list_children() if isinstance(child, PlayerListItem)
+        ]
         for player in current_game.players:
-            self.add_children(PlayerListItem(self.game, player))
+            if player not in [child.player for child in existing_player_items]:
+                # Add a child for this player, as it aren't in the UI yet
+                self.add_children(PlayerListItem(self.game, player))
+        for child in existing_player_items:
+            if child.player not in current_game.players:
+                # Remove this child from the UI, as the corrresponding player doesn't exist anymore
+                self.remove_child(child)
 
-        self.add_children(
-            Button(
-                self.game,
-                "+ Add player",
-                self.show_add_player_ui,
-                Container.AutoPlacement(),
+        if not self.list_children():
+            self.add_children(
+                Button(
+                    self.game,
+                    "+ Add player",
+                    self.add_new_player,
+                    Container.AutoPlacement(),
+                )
             )
-        )
+        # print(self.list_children())
 
     def __init__(self, game: Monopoly, page: TokenSelection):
         spawn_at = PointSpecifier(*page.get_content_start_point())

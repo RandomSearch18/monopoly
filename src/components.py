@@ -65,16 +65,15 @@ class Container(GameObject["Monopoly"]):
         return None
 
     def resolve_auto_placement(self, object: GameObject) -> GameObject:
-        if not isinstance(object.spawn_point(), self.AutoPlacement):
+        if not isinstance(object.position, self.AutoPlacement):
             return object
-        if not self._children:
-            object.spawn_point = lambda: self.spawn_at
 
         def spawn_below_previous_object() -> PointSpecifier:
             previous_object = self.get_previous_auto_positioned_child(object)
             # Align the object to the middle of the container along the cross-axis (x-axis)
             container_midpoint_x = self.collision_box().center()[0]
             x_spawn_point = Pixels(container_midpoint_x, position=CENTER)
+            print(f"Placing {object} below previous object: {previous_object}")
             y_spawn_point = (
                 BelowObject(previous_object) if previous_object else self.spawn_at.y
             )
@@ -82,18 +81,27 @@ class Container(GameObject["Monopoly"]):
                 x_spawn_point, y_spawn_point, self_corner=Corner.TOP_LEFT
             )
 
-        object.spawn_point = spawn_below_previous_object
         object.position = spawn_below_previous_object()
         return object
 
     def add_children(self, *objects: GameObject):
+        for object in objects:
+            if object in self._children:
+                raise RuntimeError(f"{object} is already a child of {self}")
         self._children.extend(objects)
         self.game.all_objects.extend(objects)
 
-    def clear_children(self):
+    def remove_all_children(self):
         for child in self._children:
             self.game.all_objects.remove(child)
         self._children.clear()
+
+    def list_children(self):
+        return self._children.copy()
+
+    def remove_child(self, child: GameObject):
+        self._children.remove(child)
+        self.game.all_objects.remove(child)
 
     def run_child_tick_tasks(self):
         for child in self._children:
