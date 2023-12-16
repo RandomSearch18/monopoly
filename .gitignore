@@ -1,3 +1,6 @@
+#Data storage files from the game
+data/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,17 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from components import Button, Header, Text
+from components import Button, Header
 
 from game_engine import (
-    CENTER,
-    START,
-    Game,
     Page,
-    Percent,
     PercentagePoint,
-    Pixels,
-    PointSpecifier,
-    PointSpecifier,
 )
 
 if TYPE_CHECKING:
@@ -25,7 +18,7 @@ class TitleScreen(Page):
         self.start_button = Button(
             game,
             "Start",
-            lambda: game.token_selection.activate(),
+            game.start_new_game,
             PercentagePoint(0.5, 0.25),
         )
 
