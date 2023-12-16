@@ -14,7 +14,7 @@ The game also requires two Python packages: `pygame` and `pydantic`, as specifed
 
 Once you've cloned this repostory, launch the main file at `src/main.py` with Python, e.g. `python3.10 src/main.py`.
 
-## Resources
+## Development resources
 
 - [Monopoly/Official Rules (Wikibooks)](https://en.wikibooks.org/wiki/Monopoly/Official_Rules) provides information on how the game logic should be implemented
 - [List of London *Monopoly* locations (Wikipedia)](https://en.wikipedia.org/wiki/List_of_London_Monopoly_locations) lists the properties in the British edition of the game, including their colours and prices
