@@ -2,9 +2,17 @@
 
 > A clone of the popular property-trading board game, made with Pygame
 
+## Installation
+
+You'll need a Python interpreter installed to run this game. Get it from [python.org Downloads](https://www.python.org/downloads/) or your OS distribution's package manager.
+
+This project targets Python 3.10 and above, so any Python version >= 3.10 is reccomended. With that said, the game seems to run fine (for now) under Python 3.8.
+
+The game also requires two Python packages: `pygame` and `pydantic`, as specifed in the `requirements.txt` file. You can install them using pip (`pip install -r requirements.txt`) or through packages provided by your OS (e.g. `python3-pygame` and `python3-pydantic`).
+
 ## Usage
 
-- Usage instructions coming soon!
+Once you've cloned this repostory, launch the main file at `src/main.py` with Python, e.g. `python3.10 src/main.py`.
 
 ## Resources
 
