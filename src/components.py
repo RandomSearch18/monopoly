@@ -55,7 +55,7 @@ class Container(GameObject["Monopoly"]):
 
 class Header(Container):
     def __init__(self, game: Monopoly, page_title: str | None = None) -> None:
-        HEADER_HEIGHT = 60
+        HEADER_HEIGHT = 40
         align_to_middle = Pixels(HEADER_HEIGHT / 2, position=CENTER)
         spawn_at = PercentagePoint(0, 0, self_corner=Alignment2D.TOP_LEFT)
         super().__init__(
@@ -65,13 +65,14 @@ class Header(Container):
 
         # PAGE TITLE
         page_title_position = PointSpecifier(
-            Pixels(0, position=START), align_to_middle, self_corner=Corner.TOP_LEFT
+            Pixels(5, position=START), align_to_middle, self_corner=Corner.TOP_LEFT
         )
         self.page_title_object = Text(
             game,
             self.get_title_text,
             page_title_position,
             color=game.theme.HEADER_FOREGROUND,
+            font=game.fonts.system_font(2.5),
         )
         self.add_child(self.page_title_object)
 
@@ -93,14 +94,15 @@ class Text(GameObject):
         game: Monopoly,
         get_content: Callable[[], str],
         spawn_at: PointSpecifier,
+        font: Font | None = None,
         color: Color | None = None,
         padding: tuple[float, float] = (0, 0),
     ) -> None:
-        # self.game = game
         self.spawn_at = spawn_at
+        font = font or game.fonts.body()
         super().__init__(
             game=game,
-            texture=TextTexture(game, get_content, game.fonts.title(), color, padding),
+            texture=TextTexture(game, get_content, font, color, padding),
         )
 
 

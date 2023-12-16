@@ -39,6 +39,7 @@ class MonopolyFonts(Fonts):
 
 class Monopoly(Game):
     theme: MonopolyTheme
+    fonts: MonopolyFonts
 
     def __init__(self):
         super().__init__(60, MonopolyTheme(), MonopolyFonts(), "Monopoly", (800, 600))
