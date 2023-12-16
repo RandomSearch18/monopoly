@@ -12,6 +12,7 @@ from game_engine import (
     GameObject,
     PercentagePoint,
     Pixels,
+    PixelsPoint,
     PlainColorTexture,
     PointSpecifier,
     PointSpecifier,
@@ -62,7 +63,9 @@ class Container(GameObject["Monopoly"]):
             y_spawn_point = (
                 BelowObject(self._children[-1]) if self._children else self.spawn_at.y
             )
-            return PointSpecifier(x_spawn_point, y_spawn_point)
+            return PointSpecifier(
+                x_spawn_point, y_spawn_point, self_corner=Corner.TOP_LEFT
+            )
 
         object.spawn_point = spawn_below_previous_object
         object.position = spawn_below_previous_object()
@@ -164,6 +167,16 @@ class ButtonTexture(TextTexture):
 
     def get_padding(self) -> Tuple[float, float]:
         return (20, 10)
+
+    def draw_at(self, provided_position: PointSpecifier):
+        position_x, position_y = provided_position.calculate_top_left(
+            self.game, self.width(), self.height()
+        )
+        padding_x, padding_y = self.get_padding()
+        # Ensure that the top-left coordinate is the top-left of the padding, not the text
+        position_x += padding_x
+        position_y += padding_y
+        super().draw_at(PixelsPoint(position_x, position_y))
 
 
 class Button(GameObject):

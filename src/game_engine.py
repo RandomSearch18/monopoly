@@ -210,6 +210,13 @@ class PercentagePoint(PointSpecifier):
         )
 
 
+class PixelsPoint(PointSpecifier):
+    def __init__(self, x_pixels: float, y_pixels: float):
+        super().__init__(
+            Pixels(x_pixels, position=START), Pixels(y_pixels, position=START), self_corner=Corner.TOP_LEFT
+        )
+
+
 class Box:
     def __init__(self, x1: float, y1: float, x2: float, y2: float):
         self.x1 = x1
@@ -320,7 +327,7 @@ class Page:
         self.game = game
         self.objects: list[GameObject] = []
         self.title = title
-        self.page_header = None
+        self.page_header: GameObject | None = None
 
     def activate(self):
         if self.title:
@@ -701,6 +708,7 @@ class GameObject(Generic[T]):
 
     def draw(self):
         self.current_coordinates = self.position.resolve(self.game)
+        #print(self, self.position.resolve(self.game))
         self.texture.draw_at(self.position)
 
     def run_tick_tasks(self):
