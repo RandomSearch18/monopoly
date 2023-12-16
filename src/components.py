@@ -33,11 +33,11 @@ class Container(GameObject["Monopoly"]):
         self,
         game: Monopoly,
         spawn_at: PointSpecifier,
-        size: tuple[float, float],
+        get_size: Callable[[], Tuple[float, float]],
         color: Color | None = None,
     ) -> None:
         # self.game = game
-        texture = PlainColorTexture(game, color, *size)
+        texture = PlainColorTexture(game, color, get_size)
         self.spawn_at = spawn_at
         super().__init__(game, texture)
         self.children: list[GameObject] = []
@@ -76,7 +76,10 @@ class Header(Container):
         align_to_middle = Pixels(HEADER_HEIGHT / 2, position=CENTER)
         spawn_at = PercentagePoint(0, 0, self_corner=Alignment2D.TOP_LEFT)
         super().__init__(
-            game, spawn_at, (game.width(), HEADER_HEIGHT), game.theme.HEADER_BACKGROUND
+            game,
+            spawn_at,
+            lambda: (game.width(), HEADER_HEIGHT),
+            game.theme.HEADER_BACKGROUND,
         )
         self.override_page_title = page_title
 

@@ -32,7 +32,7 @@ class PlayerList(Container):
         super().__init__(
             game,
             spawn_at,
-            (page.get_content_width() * 0.25, page.get_content_height()),
+            lambda: (page.get_content_width() * 0.25, page.get_content_height()),
             Color("grey"),
         )
 

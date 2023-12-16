@@ -341,7 +341,7 @@ class Page:
         if not page_header:
             return self.game.height()
         return self.game.height() - page_header.height()
-    
+
     def get_content_width(self) -> float:
         return self.game.width()
 
@@ -528,10 +528,23 @@ class Texture:
 
 
 class PlainColorTexture(Texture):
-    def __init__(self, game: Game, color: Color | None, width, height):
+    def __init__(
+        self,
+        game: Game,
+        color: Color | None,
+        get_size: Callable[[], Tuple[float, float]],
+    ):
         self.game = game
         self.color = color
-        super().__init__(width, height)
+        self.get_size = get_size
+        initial_width, initial_height = self.get_size()
+        super().__init__(initial_width, initial_height)
+
+    def width(self) -> float:
+        return self.get_size()[0]
+
+    def height(self) -> float:
+        return self.get_size()[1]
 
     def draw_at(self, position: PointSpecifier):
         if not self.color:
