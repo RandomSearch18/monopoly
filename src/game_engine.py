@@ -320,12 +320,30 @@ class Page:
         self.game = game
         self.objects: list[GameObject] = []
         self.title = title
+        self.page_header = None
 
     def activate(self):
         if self.title:
             self.game.set_window_title(self.title)
         self.game.active_page = self
         self.game.objects = self.objects
+
+    def get_content_start_point(
+        self,
+    ) -> Tuple[CoordinateSpecifier, CoordinateSpecifier]:
+        if not self.page_header:
+            return (Pixels(0, position=START), Pixels(0, position=START))
+
+        return (Pixels(0, position=START), BelowObject(self.page_header))
+
+    def get_content_height(self) -> float:
+        page_header = self.page_header
+        if not page_header:
+            return self.game.height()
+        return self.game.height() - page_header.height()
+    
+    def get_content_width(self) -> float:
+        return self.game.width()
 
 
 class Game:
