@@ -32,10 +32,30 @@ class PlayerList(Container):
         height = self.page.get_content_height()
         return width, height
 
+    def show_add_player_ui(self):
+        print("Add player UI")
+
+    def update_children(self):
+        current_game = self.game.current_game
+        assert current_game
+        self.clear_children()
+        for player in current_game.players:
+            self.add_children(PlayerListItem(self.game, player))
+
+        self.add_children(
+            Button(
+                self.game,
+                "+ Add player",
+                self.show_add_player_ui,
+                Container.AutoPlacement(),
+            )
+        )
+
     def __init__(self, game: Monopoly, page: TokenSelection):
         spawn_at = PointSpecifier(*page.get_content_start_point())
         self.page = page
         super().__init__(game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT)
+        self.tick_tasks.append(self.update_children)
 
 
 class TokenSelection(Page):

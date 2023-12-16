@@ -326,7 +326,10 @@ class Page:
         if self.title:
             self.game.set_window_title(self.title)
         self.game.active_page = self
-        self.game.objects = self.objects
+        # Replace active game objects with our objects:
+        self.game.all_objects.clear()
+        self.game.top_level_objects.clear()
+        self.game.add_objects(*self.objects)
 
     def get_content_start_point(
         self,
@@ -369,7 +372,8 @@ class Game:
         self.max_fps = max_fps
         self.clock = pygame.time.Clock()
         self.exited = False
-        self.objects: list[GameObject] = []
+        self.top_level_objects: list[GameObject] = []
+        self.all_objects: list[GameObject] = []
         self.old_window_dimensions = (self.width(), self.height())
         self.key_action_callbacks = {}
         self.key_up_callbacks = {}
@@ -381,6 +385,10 @@ class Game:
         self.keybinds = {}
 
         pygame.init()
+
+    def add_objects(self, *objects: GameObject):
+        self.all_objects.extend(objects)
+        self.top_level_objects.extend(objects)
 
     def get_initial_page(self) -> Page:
         raise NotImplementedError()
@@ -411,7 +419,7 @@ class Game:
             self.exited = True
         elif event.type == pygame.VIDEORESIZE:
             event.old_dimensions = self.old_window_dimensions
-            for object in self.objects:
+            for object in self.all_objects:
                 object.position.on_window_resize(event)
             self.old_window_dimensions = (self.width(), self.height())
 
@@ -427,8 +435,7 @@ class Game:
 
         # Mouse clicks
         elif event.type == pygame.MOUSEBUTTONUP:
-            click_x, click_y = event.pos
-            for object in self.objects:
+            for object in self.all_objects:
                 if object.collision_box().intersects_with_point(event.pos):
                     # Run any on-click callbacks for the object
                     for callback in object.on_click_tasks:
@@ -470,9 +477,9 @@ class Game:
         for event in pygame.event.get():
             self.on_event(event)
 
-        # Update the objects
+        # Update each top-level object
         if not self.is_paused:
-            for object in self.objects:
+            for object in self.top_level_objects:
                 object.run_tick_tasks()
 
     def draw_frame(self):
@@ -485,8 +492,8 @@ class Game:
         # Clear the entire surface
         self.surface.fill(self.background_color)
 
-        # Draw each object
-        for object in self.objects:
+        # Draw each top-level object
+        for object in self.top_level_objects:
             object.draw()
 
     def update_display(self):
@@ -507,7 +514,7 @@ class Game:
             self.recent_frame_times.append(self.clock.get_rawtime())
             self.clock.tick(self.max_fps)
 
-        self.objects.clear()
+        self.top_level_objects.clear()
         self.key_action_callbacks.clear()
         self.key_up_callbacks.clear()
 

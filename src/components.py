@@ -40,34 +40,47 @@ class Container(GameObject["Monopoly"]):
         texture = PlainColorTexture(game, color, get_size)
         self.spawn_at = spawn_at
         super().__init__(game, texture)
-        self.children: list[GameObject] = []
-        self.game  # (variable) game: T@__init__
+        self._children: list[GameObject] = []
+        self.tick_tasks.append(self.run_child_tick_tasks)
 
     def spawn_point(self) -> PointSpecifier:
         return self.spawn_at
 
     def draw(self):
         super().draw()
-        for child in self.children:
+        for child in self._children:
             child.draw()
 
     def preprocess_object(self, object: GameObject) -> GameObject:
         if not isinstance(object.spawn_point(), self.AutoPlacement):
             return object
-        if not self.children:
+        if not self._children:
             object.spawn_point = lambda: self.spawn_at
 
         def spawn_below_previous_object() -> PointSpecifier:
             x_spawn_point = self.spawn_at.x
-            y_spawn_point = BelowObject(self.children[-1])
+            y_spawn_point = (
+                BelowObject(self._children[-1]) if self._children else self.spawn_at.y
+            )
             return PointSpecifier(x_spawn_point, y_spawn_point)
 
         object.spawn_point = spawn_below_previous_object
+        object.position = spawn_below_previous_object()
         return object
 
     def add_children(self, *objects: GameObject):
         processed_objects = [self.preprocess_object(object) for object in objects]
-        self.children.extend(processed_objects)
+        self._children.extend(processed_objects)
+        self.game.all_objects.extend(processed_objects)
+
+    def clear_children(self):
+        for child in self._children:
+            self.game.all_objects.remove(child)
+        self._children.clear()
+
+    def run_child_tick_tasks(self):
+        for child in self._children:
+            child.run_tick_tasks()
 
 
 class Header(Container):
