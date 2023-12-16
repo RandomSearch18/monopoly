@@ -7,6 +7,7 @@ from game_engine import (
     CENTER,
     START,
     Alignment2D,
+    BelowObject,
     Corner,
     GameObject,
     PercentagePoint,
@@ -23,6 +24,10 @@ if TYPE_CHECKING:
 
 class Container(GameObject["Monopoly"]):
     """Used for easy placement of multiple objects in a single row/column"""
+
+    class AutoPlacement(PointSpecifier):
+        def __init__(self):
+            pass
 
     def __init__(
         self,
@@ -46,11 +51,23 @@ class Container(GameObject["Monopoly"]):
         for child in self.children:
             child.draw()
 
-    def add_child(self, object: GameObject):
-        self.children.append(object)
+    def preprocess_object(self, object: GameObject) -> GameObject:
+        if not isinstance(object.spawn_point(), self.AutoPlacement):
+            return object
+        if not self.children:
+            object.spawn_point = lambda: self.spawn_at
+
+        def spawn_below_previous_object() -> PointSpecifier:
+            x_spawn_point = self.spawn_at.x
+            y_spawn_point = BelowObject(self.children[-1])
+            return PointSpecifier(x_spawn_point, y_spawn_point)
+
+        object.spawn_point = spawn_below_previous_object
+        return object
 
     def add_children(self, *objects: GameObject):
-        self.children.extend(objects)
+        processed_objects = [self.preprocess_object(object) for object in objects]
+        self.children.extend(processed_objects)
 
 
 class Header(Container):
@@ -74,7 +91,7 @@ class Header(Container):
             color=game.theme.HEADER_FOREGROUND,
             font=game.fonts.system_font(2.5),
         )
-        self.add_child(self.page_title_object)
+        self.add_children(self.page_title_object)
 
     def get_title_text(self) -> str:
         if self.override_page_title:

@@ -19,6 +19,9 @@ class Player(BaseModel):
     nickname: str
     token: Token
 
+    def __str__(self) -> str:
+        return self.nickname
+
 
 class SavedGame(BaseModel):
     started_at: datetime

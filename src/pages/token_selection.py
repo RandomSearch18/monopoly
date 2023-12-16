@@ -1,10 +1,29 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from components import Header, Text
-from game_engine import START, Page, Pixels, PointSpecifier
+
+from components import Button, Container, Header
+from data_storage import Player
+from game_engine import START, GameObject, Page, Pixels, PointSpecifier
 
 if TYPE_CHECKING:
     from main import Monopoly
+
+
+class PlayerListItem(Button):
+    """A clickable entry in the player list"""
+
+    def __init__(self, game: Monopoly, player: Player):
+        super().__init__(
+            game, player.nickname, self.on_click, Container.AutoPlacement()
+        )
+        self.player = player
+
+    def on_click(self):
+        print(f"Clicked on {self.player}")
+
+
+class PlayerList(Container):
+    """A sidebar showing any players that have been added to the game"""
 
 
 class TokenSelection(Page):
