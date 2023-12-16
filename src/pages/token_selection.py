@@ -27,14 +27,15 @@ class PlayerListItem(Button):
 class PlayerList(Container):
     """A sidebar showing a list of any players that have been added to the game"""
 
+    def get_size(self) -> tuple[float, float]:
+        width = max(self.page.get_content_width() * 0.3, 150)
+        height = self.page.get_content_height()
+        return width, height
+
     def __init__(self, game: Monopoly, page: TokenSelection):
         spawn_at = PointSpecifier(*page.get_content_start_point())
-        super().__init__(
-            game,
-            spawn_at,
-            lambda: (page.get_content_width() * 0.25, page.get_content_height()),
-            Color("grey"),
-        )
+        self.page = page
+        super().__init__(game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT)
 
 
 class TokenSelection(Page):

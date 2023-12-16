@@ -18,6 +18,7 @@ class MonopolyTheme(Theme):
     BACKGROUND = Color("white")
     HEADER_BACKGROUND = Color("red")
     HEADER_FOREGROUND = Color("white")
+    BACKGROUND_ACCENT = Color("#cfdccd")
 
 
 class MonopolyFonts(Fonts):
