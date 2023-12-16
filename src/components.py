@@ -130,7 +130,7 @@ class ButtonTexture(TextTexture):
         return self.base_color
 
     def get_padding(self) -> Tuple[float, float]:
-        return (50, 10)
+        return (20, 10)
 
 
 class Button(GameObject):

@@ -17,7 +17,7 @@ class TitleScreen(Page):
         self.page_header = Header(game, "Welcome to Monopoly")
         self.start_button = Button(
             game,
-            "Start",
+            "Start new game",
             game.start_new_game,
             PercentagePoint(0.5, 0.25),
         )
