@@ -147,7 +147,7 @@ class BelowObject(CoordinateSpecifier):
         leader_position = self.leader_object.current_coordinates
         if not leader_position:
             raise RuntimeError(
-                "Can't render an object relative to an object that hasn't been rendered yet"
+                f"Can't render an object relative to an object that hasn't been rendered yet ({self.leader_object})!"
             )
         leader_bottom = leader_position[1] + self.leader_object.height()
         return leader_bottom + self.gap_pixels
@@ -213,7 +213,9 @@ class PercentagePoint(PointSpecifier):
 class PixelsPoint(PointSpecifier):
     def __init__(self, x_pixels: float, y_pixels: float):
         super().__init__(
-            Pixels(x_pixels, position=START), Pixels(y_pixels, position=START), self_corner=Corner.TOP_LEFT
+            Pixels(x_pixels, position=START),
+            Pixels(y_pixels, position=START),
+            self_corner=Corner.TOP_LEFT,
         )
 
 
@@ -708,7 +710,7 @@ class GameObject(Generic[T]):
 
     def draw(self):
         self.current_coordinates = self.position.resolve(self.game)
-        #print(self, self.position.resolve(self.game))
+        # print(self, self.position.resolve(self.game))
         self.texture.draw_at(self.position)
 
     def run_tick_tasks(self):

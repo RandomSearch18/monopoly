@@ -50,7 +50,18 @@ class Container(GameObject["Monopoly"]):
     def draw(self):
         super().draw()
         for child in self._children:
+            child = self.preprocess_object(child)
             child.draw()
+
+    def get_previous_auto_positioned_child(
+        self, current_child: GameObject
+    ) -> GameObject | None:
+        """Returns the previous child that was auto-positioned, or None if there is none"""
+        index = self._children.index(current_child)
+        for child in reversed(self._children[:index]):
+            if isinstance(child.spawn_point(), self.AutoPlacement):
+                return child
+        return None
 
     def preprocess_object(self, object: GameObject) -> GameObject:
         if not isinstance(object.spawn_point(), self.AutoPlacement):
@@ -59,9 +70,12 @@ class Container(GameObject["Monopoly"]):
             object.spawn_point = lambda: self.spawn_at
 
         def spawn_below_previous_object() -> PointSpecifier:
-            x_spawn_point = self.spawn_at.x
+            previous_object = self.get_previous_auto_positioned_child(object)
+            # Align the object to the middle of the container along the cross-axis (x-axis)
+            container_midpoint_x = self.collision_box().center()[0]
+            x_spawn_point = Pixels(container_midpoint_x, position=CENTER)
             y_spawn_point = (
-                BelowObject(self._children[-1]) if self._children else self.spawn_at.y
+                BelowObject(previous_object) if previous_object else self.spawn_at.y
             )
             return PointSpecifier(
                 x_spawn_point, y_spawn_point, self_corner=Corner.TOP_LEFT
@@ -72,7 +86,9 @@ class Container(GameObject["Monopoly"]):
         return object
 
     def add_children(self, *objects: GameObject):
-        processed_objects = [self.preprocess_object(object) for object in objects]
+        processed_objects = (
+            objects  # [self.preprocess_object(object) for object in objects]
+        )
         self._children.extend(processed_objects)
         self.game.all_objects.extend(processed_objects)
 
