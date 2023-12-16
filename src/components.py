@@ -38,10 +38,10 @@ class Container(GameObject["Monopoly"]):
         color: Color | None = None,
     ) -> None:
         # self.game = game
+        self._children: list[GameObject] = []
         texture = PlainColorTexture(game, color, get_size)
         self.spawn_at = spawn_at
         super().__init__(game, texture)
-        self._children: list[GameObject] = []
         self.tick_tasks.append(self.run_child_tick_tasks)
 
     def spawn_point(self) -> PointSpecifier:
@@ -50,7 +50,8 @@ class Container(GameObject["Monopoly"]):
     def draw(self):
         super().draw()
         for child in self._children:
-            child = self.preprocess_object(child)
+            # If it wants to be automatically positioned, then work out where it should go (and store that)
+            child = self.resolve_auto_placement(child)
             child.draw()
 
     def get_previous_auto_positioned_child(
@@ -63,7 +64,7 @@ class Container(GameObject["Monopoly"]):
                 return child
         return None
 
-    def preprocess_object(self, object: GameObject) -> GameObject:
+    def resolve_auto_placement(self, object: GameObject) -> GameObject:
         if not isinstance(object.spawn_point(), self.AutoPlacement):
             return object
         if not self._children:
@@ -86,11 +87,8 @@ class Container(GameObject["Monopoly"]):
         return object
 
     def add_children(self, *objects: GameObject):
-        processed_objects = (
-            objects  # [self.preprocess_object(object) for object in objects]
-        )
-        self._children.extend(processed_objects)
-        self.game.all_objects.extend(processed_objects)
+        self._children.extend(objects)
+        self.game.all_objects.extend(objects)
 
     def clear_children(self):
         for child in self._children:
@@ -100,6 +98,13 @@ class Container(GameObject["Monopoly"]):
     def run_child_tick_tasks(self):
         for child in self._children:
             child.run_tick_tasks()
+
+    def get_widest_child(self) -> GameObject | None:
+        widest_child = None
+        for child in self._children:
+            if widest_child is None or child.width() > widest_child.width():
+                widest_child = child
+        return widest_child
 
 
 class Header(Container):

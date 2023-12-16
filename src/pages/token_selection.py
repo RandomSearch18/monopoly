@@ -28,7 +28,9 @@ class PlayerList(Container):
     """A sidebar showing a list of any players that have been added to the game"""
 
     def get_size(self) -> tuple[float, float]:
-        width = max(self.page.get_content_width() * 0.3, 150)
+        widest_child = self.get_widest_child()
+        min_width = widest_child.width() if widest_child else 100
+        width = max(self.page.get_content_width() * 0.3, min_width)
         height = self.page.get_content_height()
         return width, height
 
