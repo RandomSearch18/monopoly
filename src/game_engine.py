@@ -158,6 +158,30 @@ class BelowObject(CoordinateSpecifier):
         return resolved_coordinate + offset
 
 
+class CenterAlignedToObject(CoordinateSpecifier):
+    def __init__(
+        self, leader_object: GameObject, get_leader_object_length: Callable[[], float]
+    ) -> None:
+        self.leader_object = leader_object
+        # This should be set to te width or height of the leader_object, depending on which axis is being used
+        self.get_leader_object_length = get_leader_object_length
+        self.self_edge = CENTER
+
+    def resolve(self, _=None) -> float:
+        leader_position = self.leader_object.current_coordinates
+        if not leader_position:
+            raise RuntimeError(
+                f"Can't render an object relative to an object that hasn't been rendered yet ({self.leader_object})!"
+            )
+        leader_center = leader_position[0] + self.get_leader_object_length() / 2
+        return leader_center
+
+    def find_edge(self, edge: LineEdge, _outer_size, self_length: float) -> float:
+        resolved_coordinate = self.resolve()
+        offset = self.calculate_offest_to_edge(edge, self_length)
+        return resolved_coordinate + offset
+
+
 class PointSpecifier:
     def __init__(
         self,

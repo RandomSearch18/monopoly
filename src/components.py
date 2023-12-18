@@ -8,6 +8,7 @@ from game_engine import (
     START,
     Alignment2D,
     BelowObject,
+    CenterAlignedToObject,
     Corner,
     GameObject,
     PercentagePoint,
@@ -71,8 +72,7 @@ class Container(GameObject["Monopoly"]):
         def spawn_below_previous_object() -> PointSpecifier:
             previous_object = self.get_previous_auto_positioned_child(object)
             # Align the object to the middle of the container along the cross-axis (x-axis)
-            container_midpoint_x = self.collision_box().center()[0]
-            x_spawn_point = Pixels(container_midpoint_x, position=CENTER)
+            x_spawn_point = CenterAlignedToObject(self, self.width)
             print(f"Placing {object} below previous object: {previous_object}")
             y_spawn_point = (
                 BelowObject(previous_object) if previous_object else self.spawn_at.y
