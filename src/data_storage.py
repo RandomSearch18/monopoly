@@ -41,5 +41,8 @@ class SavedGame(BaseModel):
             raise RuntimeError("No more tokens available")
         return unused_tokens[0]
 
+    def get_next_default_player_name(self) -> str:
+        return f"Player {len(self.players) + 1}"
+
     def __str__(self):
         return self.started_at.strftime("Game<%Y-%m-%d %H:%M:%S>")
