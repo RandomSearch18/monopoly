@@ -57,21 +57,27 @@ class PlayerList(Container):
                 # Remove this child from the UI, as the corrresponding player doesn't exist anymore
                 self.remove_child(child)
 
-        if not self.list_children():
-            self.add_children(
-                Button(
-                    self.game,
-                    "+ Add player",
-                    self.add_new_player,
-                    Container.AutoPlacement(),
-                )
+        should_show_add_player_button = current_game.data.get_free_player_slots() > 0
+        # Add the "Add player" button if it doesn't exist yet (and there are free slots)
+        if not self.add_player_button and should_show_add_player_button:
+            self.add_player_button = Button(
+                self.game,
+                "+ Add player",
+                self.add_new_player,
+                Container.AutoPlacement(),
             )
-        # print(self.list_children())
+            self.add_children(self.add_player_button)
+
+        # Remove the "Add player" button if we're now at max capacity
+        if self.add_player_button and not should_show_add_player_button:
+            self.remove_child(self.add_player_button)
+            self.add_player_button = None
 
     def __init__(self, game: Monopoly, page: TokenSelection):
         spawn_at = PointSpecifier(*page.get_content_start_point())
         self.page = page
         super().__init__(game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT)
+        self.add_player_button: Button | None = None
         self.tick_tasks.append(self.update_children)
 
 
