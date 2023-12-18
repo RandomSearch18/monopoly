@@ -23,7 +23,7 @@ class Player(BaseModel):
         return self.nickname
 
 
-class SavedGame(BaseModel):
+class SavedGameData(BaseModel):
     started_at: datetime
     is_saved_to_disk: bool
     players: list[Player]

@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import pygame
-from data_storage import Player, SavedGame
+from data_storage import Player, SavedGameData
 from game_engine import Fonts, Game, Page, Theme
 from pages.title_screen import TitleScreen
 from pages.token_selection import TokenSelection
@@ -42,19 +42,19 @@ class MonopolyFonts(Fonts):
 
 
 class SavedGameManager:
-    def __init__(self, session: Game, save: SavedGame) -> None:
+    def __init__(self, session: Game, data: SavedGameData) -> None:
         self.game = session
-        self.save = save
+        self.data = data
         self.game_save_exception: Exception | None = None
         self.save_file_exists = False
 
     def add_player(self, player: Player):
-        self.save.players.append(player)
+        self.data.players.append(player)
         self.save_to_disk()
 
     def save_to_disk(self):
-        serialized_game_data = self.save.model_dump_json(indent=2)
-        json_file_name_timestamp = self.save.started_at.strftime("%Y-%m-%d %H-%M-%S")
+        serialized_game_data = self.data.model_dump_json(indent=2)
+        json_file_name_timestamp = self.data.started_at.strftime("%Y-%m-%d %H-%M-%S")
         json_file_path = Path(
             "data",
             "saves",
@@ -71,7 +71,7 @@ class SavedGameManager:
             with open(json_file_path, mode) as json_file:
                 json_file.write(serialized_game_data)
             self.save_file_exists = True
-            self.save.is_saved_to_disk = True
+            self.data.is_saved_to_disk = True
             print("Successfuly saved game to disk")
         except OSError as exception:
             if isinstance(exception, FileExistsError):
@@ -80,7 +80,7 @@ class SavedGameManager:
 
             print(f"Error: Failed to save this game session: {exception}")
             self.game_save_exception = exception
-            self.save.is_saved_to_disk = False
+            self.data.is_saved_to_disk = False
 
 
 class Monopoly(Game):
@@ -97,7 +97,7 @@ class Monopoly(Game):
         return self.title_screen
 
     def start_new_game(self):
-        new_game = SavedGame(
+        new_game = SavedGameData(
             started_at=datetime.now(), players=[], is_saved_to_disk=False
         )
         self.current_game = SavedGameManager(self, new_game)

@@ -38,8 +38,8 @@ class PlayerList(Container):
         print("New player button clicked")
         current_game = self.game.current_game
         assert current_game
-        initial_name = current_game.save.get_next_default_player_name()
-        initial_token = current_game.save.get_next_unused_token()
+        initial_name = current_game.data.get_next_default_player_name()
+        initial_token = current_game.data.get_next_unused_token()
         current_game.add_player(Player(nickname=initial_name, token=initial_token))
 
     def update_children(self):
@@ -48,12 +48,12 @@ class PlayerList(Container):
         existing_player_items = [
             child for child in self.list_children() if isinstance(child, PlayerListItem)
         ]
-        for player in current_game.save.players:
+        for player in current_game.data.players:
             if player not in [child.player for child in existing_player_items]:
                 # Add a child for this player, as it aren't in the UI yet
                 self.add_children(PlayerListItem(self.game, player))
         for child in existing_player_items:
-            if child.player not in current_game.save.players:
+            if child.player not in current_game.data.players:
                 # Remove this child from the UI, as the corrresponding player doesn't exist anymore
                 self.remove_child(child)
 
