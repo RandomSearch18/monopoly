@@ -10,6 +10,8 @@ from pygame.rect import Rect
 from pygame.event import Event
 from pygame.font import Font
 
+from events import EventEmitter
+
 
 class Corner(Enum):
     TOP_LEFT = (-1, -1)
@@ -724,12 +726,14 @@ class GameObject(Generic[T]):
         # assert hasattr(self, "game")
         # assert isinstance(self.game, Game)
         self.game: T = game
+        self.events = EventEmitter()
         self.tick_tasks: list[Callable] = []
         self.on_click_tasks: list[Callable[[Event], None]] = []
         self.texture = texture
         self.is_solid = solid
         self.spawned_at = pygame.time.get_ticks()
         self.current_coordinates: Tuple[float, float] | None = None
+        self.exists = True
         self.reset()
 
     def draw(self):
