@@ -39,7 +39,7 @@ class PlayerList(Container):
         current_game = self.game.current_game
         assert current_game
         initial_name = current_game.data.get_next_default_player_name()
-        initial_token = current_game.data.get_next_unused_token()
+        initial_token = current_game.data.get_unused_token()
         current_game.add_player(Player(nickname=initial_name, token=initial_token))
 
     def update_children(self):

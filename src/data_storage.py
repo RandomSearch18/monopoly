@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, ConfigDict
+import random
+from pydantic import BaseModel
 
 
 class Token(Enum):
@@ -35,11 +36,12 @@ class SavedGameData(BaseModel):
             if token not in [player.token for player in self.players]
         ]
 
-    def get_next_unused_token(self) -> Token:
+    def get_unused_token(self) -> Token:
+        """Returns a random token that isn't already assigned to a player"""
         unused_tokens = self.get_unused_tokens()
         if not unused_tokens:
             raise RuntimeError("No more tokens available")
-        return unused_tokens[0]
+        return random.choice(unused_tokens)
 
     def get_next_default_player_name(self) -> str:
         return f"Player {len(self.players) + 1}"
