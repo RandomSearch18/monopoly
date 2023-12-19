@@ -16,7 +16,7 @@ class PlayerListItem(Button):
 
     def __init__(self, game: Monopoly, player: Player):
         super().__init__(
-            game, player.nickname, self.on_click, Container.AutoPlacement()
+            game, player.nickname, self.on_click, Container.AutoPlacement(5)
         )
         self.player = player
 
@@ -64,7 +64,7 @@ class PlayerList(Container):
                 self.game,
                 "+ Add player",
                 self.add_new_player,
-                Container.AutoPlacement(),
+                Container.AutoPlacement(gap_pixels=10),
             )
             self.add_children(self.add_player_button)
 

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import copy
 import math
 from collections import deque
 from enum import Enum
@@ -53,12 +54,28 @@ class CoordinateSpecifier:
     # On a line, -1 is the start of the line, 0 is the center, and 1 is the end of the line
     # In an object, -1 is the left/top edge, 0 is the center, and 1 is the right/bottom edge
     self_edge: LineEdge | None
+    # Stores a postive or negative number of pixels that the resolved value should be "moved" by
+    move_by_pixels: float = 0
 
-    def resolve(self, outer_size: float) -> float:
+    def _apply_movement(self, resolved_coordinate) -> float:
+        return resolved_coordinate + self.move_by_pixels
+
+    def resolve_unmoved_value(self, outer_size: float) -> float:
         raise NotImplementedError()
 
-    # def move_by(self, pixels: float):
-    #     raise NotImplementedError()
+    def resolve(self, outer_size: float) -> float:
+        return self._apply_movement(self.resolve_unmoved_value(outer_size))
+
+    def move_by(self, pixels: float):
+        self.move_by_pixels += pixels
+
+    def copy(self):
+        return copy.copy(self)
+
+    def to_moved(self, pixels: float):
+        new_specifier = self.copy()
+        new_specifier.move_by(pixels)
+        return new_specifier
 
     def calculate_offest_to_edge(
         self, target_edge: LineEdge, line_length: float
@@ -95,18 +112,18 @@ class Pixels(CoordinateSpecifier):
         pixel_movement = -pixels if self.outer_edge == 1 else +pixels
         self.pixels += pixel_movement
 
-    def resolve(self, outer_size: float) -> float:
+    def resolve_unmoved_value(self, outer_size: float) -> float:
         start_from = outer_size if self.outer_edge == 1 else 0
         offset = -self.pixels if self.outer_edge == 1 else +self.pixels
         actual_coordinate = start_from + offset
         return actual_coordinate
 
     def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
-        resolved_coordinate = self.resolve(outer_size)
+        coordinate_value = self.resolve(outer_size)
         if self.self_edge is None:
             raise RuntimeError("Cannot find edge of a standalone coordinate")
         offset = self.calculate_offest_to_edge(edge, self_length)
-        return resolved_coordinate + offset
+        return coordinate_value + offset
 
 
 class Percent(CoordinateSpecifier):
@@ -120,7 +137,7 @@ class Percent(CoordinateSpecifier):
         self.outer_edge = outer_edge  # Outer reference point
         self.self_edge = position  # Inner reference point
 
-    def resolve(self, outer_size: float) -> float:
+    def resolve_unmoved_value(self, outer_size: float) -> float:
         pixels_specifier = Pixels(
             self.percent * outer_size, self.outer_edge, self.self_edge
         )
@@ -144,20 +161,22 @@ class BelowObject(CoordinateSpecifier):
         self.leader_object = leader_object
         self.gap_pixels = gap_pixels
         self.self_edge = START
+        print(f"Specified point {gap_pixels}px below {leader_object}")
 
-    def resolve(self, outer_size: float) -> float:
+    def resolve_unmoved_value(self, outer_size: float) -> float:
         leader_position = self.leader_object.current_coordinates
         if not leader_position:
             raise RuntimeError(
                 f"Can't render an object relative to an object that hasn't been rendered yet ({self.leader_object})!"
             )
         leader_bottom = leader_position[1] + self.leader_object.height()
+        # print(self.gap_pixels)
         return leader_bottom + self.gap_pixels
 
     def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
-        resolved_coordinate = self.resolve(outer_size)
+        coordinate_value = self.resolve(outer_size)
         offset = self.calculate_offest_to_edge(edge, self_length)
-        return resolved_coordinate + offset
+        return coordinate_value + offset
 
 
 class CenterAlignedToObject(CoordinateSpecifier):
@@ -169,7 +188,7 @@ class CenterAlignedToObject(CoordinateSpecifier):
         self.get_leader_object_length = get_leader_object_length
         self.self_edge = CENTER
 
-    def resolve(self, _=None) -> float:
+    def resolve_unmoved_value(self, _=None) -> float:
         leader_position = self.leader_object.current_coordinates
         if not leader_position:
             raise RuntimeError(
@@ -179,7 +198,7 @@ class CenterAlignedToObject(CoordinateSpecifier):
         return leader_center
 
     def find_edge(self, edge: LineEdge, _outer_size, self_length: float) -> float:
-        resolved_coordinate = self.resolve()
+        resolved_coordinate = self.resolve_unmoved_value()
         offset = self.calculate_offest_to_edge(edge, self_length)
         return resolved_coordinate + offset
 

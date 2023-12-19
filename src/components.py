@@ -29,8 +29,8 @@ class Container(GameObject["Monopoly"]):
     """Used for easy placement of multiple objects in a single row/column"""
 
     class AutoPlacement(PointSpecifier):
-        def __init__(self):
-            pass
+        def __init__(self, gap_pixels=0):
+            self.gap_pixels = gap_pixels
 
     def __init__(
         self,
@@ -70,14 +70,19 @@ class Container(GameObject["Monopoly"]):
     def resolve_auto_placement(self, object: GameObject):
         if not isinstance(object.position, self.AutoPlacement):
             return object
+        auto_placement = object.position
         previous_object = self.get_previous_auto_positioned_child(object)
 
         def spawn_below_previous_object() -> PointSpecifier:
             # Align the object to the middle of the container along the cross-axis (x-axis)
             x_spawn_point = CenterAlignedToObject(self, self.width)
-            print(f"Placing {object} below previous object: {previous_object}")
+            print(
+                f"Placing {object} {auto_placement.gap_pixels}px below {previous_object}"
+            )
             y_spawn_point = (
-                BelowObject(previous_object) if previous_object else self.spawn_at.y
+                BelowObject(previous_object, auto_placement.gap_pixels)
+                if previous_object
+                else self.spawn_at.y.to_moved(auto_placement.gap_pixels)
             )
             return PointSpecifier(
                 x_spawn_point, y_spawn_point, self_corner=Corner.TOP_LEFT
