@@ -732,7 +732,6 @@ class GameObject(Generic[T]):
         raise NotImplementedError()
 
     def set_position(self, position: PointSpecifier):
-        print(f"Moving {self} to {position}")
         self._position = position
 
     def position(self) -> PointSpecifier:
