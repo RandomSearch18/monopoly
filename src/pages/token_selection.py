@@ -69,7 +69,7 @@ class PlayerList(Container):
                 self.game,
                 "+ Add player",
                 self.add_new_player,
-                Container.AutoPlacement(gap_pixels=10),
+                Container.AutoPlacement(),
             )
             self.add_children(self.add_player_button)
 
@@ -82,7 +82,9 @@ class PlayerList(Container):
     def __init__(self, game: Monopoly, page: TokenSelection):
         spawn_at = PointSpecifier(*page.get_content_start_point())
         self.page = page
-        super().__init__(game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT)
+        super().__init__(
+            game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT, padding_top=10
+        )
         self.add_player_button: Button | None = None
         self.tick_tasks.append(self.update_children)
 
