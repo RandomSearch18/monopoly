@@ -51,15 +51,20 @@ class PlayerList(Container):
         for player in current_game.data.players:
             if player not in [child.player for child in existing_player_items]:
                 # Add a child for this player, as it aren't in the UI yet
+                print(f"PlayerList: Adding list item for {player}")
                 self.add_children(PlayerListItem(self.game, player))
         for child in existing_player_items:
             if child.player not in current_game.data.players:
                 # Remove this child from the UI, as the corrresponding player doesn't exist anymore
+                print(
+                    f"PlayerList: Removing list item for {child.player} (hint: this shouldn't happen yet)"
+                )
                 self.remove_child(child)
 
         should_show_add_player_button = current_game.data.get_free_player_slots() > 0
         # Add the "Add player" button if it doesn't exist yet (and there are free slots)
         if not self.add_player_button and should_show_add_player_button:
+            print(f'PlayerList: Adding "+ Player" button')
             self.add_player_button = Button(
                 self.game,
                 "+ Add player",
@@ -70,6 +75,7 @@ class PlayerList(Container):
 
         # Remove the "Add player" button if we're now at max capacity
         if self.add_player_button and not should_show_add_player_button:
+            print(f'PlayerList: Removing "+ Player" button')
             self.remove_child(self.add_player_button)
             self.add_player_button = None
 

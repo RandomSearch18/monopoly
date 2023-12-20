@@ -1,0 +1,203 @@
+pygame 2.5.2 (SDL 2.28.2, Python 3.12.1)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+Moving <components.Header object at 0x7fa03c88f8c0> to <game_engine.PercentagePoint object at 0x7fa03c88f980>
+Moving <components.Text object at 0x7fa03c88fb00> to <game_engine.PointSpecifier object at 0x7fa03cab3bf0>
+Moving Button<'Start new game'> to <game_engine.PercentagePoint object at 0x7fa03c88fbf0>
+Moving <components.Header object at 0x7fa03c88fe60> to <game_engine.PercentagePoint object at 0x7fa03c88ff20>
+Moving <components.Text object at 0x7fa03c878140> to <game_engine.PointSpecifier object at 0x7fa03c878080>
+Specified point 0px below <components.Header object at 0x7fa03c88fe60>
+Moving <pages.token_selection.PlayerList object at 0x7fa03c878230> to <game_engine.PointSpecifier object at 0x7fa03c8782c0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+<components.Text object at 0x7fa03c88fb00> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c9730b0>
+Started new game: <__main__.SavedGameManager object at 0x7fa03c88fbc0>
+Moving Button<'+ Add player'> to <components.Container.AutoPlacement object at 0x7fa03ffa8800>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Entering resolve_auto_placement for Button<'+ Add player'> <components.Container.AutoPlacement object at 0x7fa03ffa8800>
+Placing Button<'+ Add player'> 10px below None
+Moving Button<'+ Add player'> to <game_engine.PointSpecifier object at 0x7fa03c8799a0>
+Set position for Button<'+ Add player'> to <game_engine.PointSpecifier object at 0x7fa03c8799a0>
+Set position for Button<'+ Add player'> to <game_engine.PointSpecifier object at 0x7fa03c8799a0> <class 'game_engine.CenterAlignedToObject'>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+New player button clicked
+Successfuly saved game to disk
+Moving Button<'Player 1'> to <components.Container.AutoPlacement object at 0x7fa0406430b0>
+<components.Text object at 0x7fa03c878140> doesn't need auto-positioning; its x-position is <game_engine.Pixels object at 0x7fa03c878050>
+Start <class 'game_engine.CenterAlignedToObject'>
+Entering resolve_auto_placement for Button<'+ Add player'>; its x-pos is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0> <class 'game_engine.CenterAlignedToObject'>
+Button<'+ Add player'> doesn't need auto-positioning; its x-position is <game_engine.CenterAlignedToObject object at 0x7fa03c879bb0>
+End <class 'game_engine.CenterAlignedToObject'>
+Start <class 'game_engine.CenterAlignedToObject'>

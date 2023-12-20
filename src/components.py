@@ -10,6 +10,7 @@ from game_engine import (
     Alignment2D,
     BelowObject,
     CenterAlignedToObject,
+    CoordinateSpecifier,
     Corner,
     GameObject,
     PercentagePoint,
@@ -38,6 +39,7 @@ class Container(GameObject["Monopoly"]):
         spawn_at: PointSpecifier,
         get_size: Callable[[], Tuple[float, float]],
         color: Color | None = None,
+        padding_top: float = 0,
     ) -> None:
         # self.game = game
         self._children: list[GameObject] = []
@@ -45,6 +47,7 @@ class Container(GameObject["Monopoly"]):
         self.spawn_at = spawn_at
         super().__init__(game, texture)
         self.tick_tasks.append(self.run_child_tick_tasks)
+        self.padding_top = padding_top
 
     def spawn_point(self) -> PointSpecifier:
         return self.spawn_at
@@ -52,9 +55,15 @@ class Container(GameObject["Monopoly"]):
     def draw(self):
         super().draw()
         for child in self._children:
+            if not isinstance(self._children[0].position(), self.AutoPlacement):
+                if isinstance(self._children[0], Button):
+                    print("Start", self._children[0].position().x.__class__)
             # If it wants to be automatically positioned, then work out where it should go (and store that)
             self.resolve_auto_placement(child)
             child.draw()
+            if not isinstance(self._children[0].position(), self.AutoPlacement):
+                if isinstance(self._children[0], Button):
+                    print("End", self._children[0].position().x.__class__)
 
     def get_previous_auto_positioned_child(
         self, current_child: GameObject
@@ -68,9 +77,23 @@ class Container(GameObject["Monopoly"]):
         return None
 
     def resolve_auto_placement(self, object: GameObject):
-        if not isinstance(object.position, self.AutoPlacement):
+        if isinstance(object, Button):
+            if not isinstance(object.position(), self.AutoPlacement):
+                print(
+                    f"Entering resolve_auto_placement for {object}; its x-pos is",
+                    object.position().x.__class__,
+                )
+            else:
+                print(
+                    f"Entering resolve_auto_placement for {object}; its x-pos is",
+                    object.position(),
+                )
+        auto_placement = object.position()
+        if not isinstance(auto_placement, self.AutoPlacement):
+            print(
+                f"{object} doesn't need auto-positioning; its x-position is {auto_placement.x}"
+            )
             return object
-        auto_placement = object.position
         previous_object = self.get_previous_auto_positioned_child(object)
 
         def spawn_below_previous_object() -> PointSpecifier:
@@ -82,7 +105,9 @@ class Container(GameObject["Monopoly"]):
             y_spawn_point = (
                 BelowObject(previous_object, auto_placement.gap_pixels)
                 if previous_object
-                else self.spawn_at.y.to_moved(auto_placement.gap_pixels)
+                else self.get_content_start_point()[1].to_moved(
+                    auto_placement.gap_pixels
+                )
             )
             return PointSpecifier(
                 x_spawn_point, y_spawn_point, self_corner=Corner.TOP_LEFT
@@ -91,9 +116,12 @@ class Container(GameObject["Monopoly"]):
         def resolve_auto_placement_again():
             print(f"Re-resolving auto placement for {object}")
             # Marks the object as needing its auto-placement resolved
-            object.position = self.AutoPlacement()
+            object.set_position(object.spawn_point())
             object.events.remove_listener(Event.OBJECT_REMOVE, event_listener)
             self.resolve_auto_placement(object)
+            print(
+                f"Finished re-resolving auto placement for {object}; its x-pos={object.position().x}"
+            )
 
         if previous_object:
             # Re-resolve the auto placement for this object if its designated previous object is removed
@@ -101,7 +129,36 @@ class Container(GameObject["Monopoly"]):
                 Event.OBJECT_REMOVE, resolve_auto_placement_again
             )
 
-        object.position = spawn_below_previous_object()
+        object.set_position(spawn_below_previous_object())
+        # if (
+        #     isinstance(self._children[0], Button)
+        #     and not isinstance(self._children[0].position(), self.AutoPlacement)
+        #     and isinstance(self._children[0].position().x, Pixels)
+        # ):
+        #     print(
+        #         "AAAAAAAAAAAAAA",
+        #         self._children[0],
+        #         "is at x=",
+        #         self._children[0].position().x,
+        #     )
+        #     print("Current object is", object)
+        print(f"Set position for {object} to {object.position()}")
+        if isinstance(self._children[0], Button):
+            if not isinstance(self._children[0].position(), self.AutoPlacement):
+                print(
+                    f"Set position for {object} to {object.position()}",
+                    self._children[0].position().x.__class__,
+                )
+            else:
+                print(
+                    f"Set position for {object} to {object.position()}",
+                    self._children[0].position(),
+                )
+
+    def get_content_start_point(
+        self,
+    ) -> tuple[CoordinateSpecifier, CoordinateSpecifier]:
+        return self.spawn_at.x, self.spawn_at.y.to_moved(self.padding_top)
 
     def add_children(self, *objects: GameObject):
         for object in objects:
@@ -122,7 +179,25 @@ class Container(GameObject["Monopoly"]):
 
     def remove_child(self, child: GameObject):
         child.exists = False
+        if isinstance(self._children[0], Button) and not isinstance(
+            self._children[0].position(), self.AutoPlacement
+        ):
+            print(
+                "Before child.events.emit(Event.OBJECT_REMOVE)",
+                self._children[0],
+                "is at x=",
+                self._children[0].position().x,
+            )
         child.events.emit(Event.OBJECT_REMOVE)
+        if isinstance(self._children[0], Button) and not isinstance(
+            self._children[0].position(), self.AutoPlacement
+        ):
+            print(
+                "After child.events.emit(Event.OBJECT_REMOVE)",
+                self._children[0],
+                "is at x=",
+                self._children[0].position().x,
+            )
         self._children.remove(child)
         self.game.all_objects.remove(child)
 
@@ -243,7 +318,7 @@ class Button(GameObject):
         # self.game = game
         self.label = label
         self.callback = callback
-        self.spawn_at = spawn_at
+        self._spawn_at = spawn_at
         self.font = font or game.fonts.button()
         self.texture = ButtonTexture(
             game, self, self.get_content, self.font, Color("green")
@@ -258,7 +333,7 @@ class Button(GameObject):
         return self.label
 
     def spawn_point(self) -> PointSpecifier:
-        return self.spawn_at
+        return self._spawn_at
 
     def __str__(self) -> str:
         return f"Button<'{self.label}'>"

@@ -474,7 +474,7 @@ class Game:
         elif event.type == pygame.VIDEORESIZE:
             event.old_dimensions = self.old_window_dimensions
             for object in self.all_objects:
-                object.position.on_window_resize(event)
+                object.position().on_window_resize(event)
             self.old_window_dimensions = (self.width(), self.height())
 
         # Keyboard input
@@ -731,10 +731,17 @@ class GameObject(Generic[T]):
     def spawn_point(self) -> PointSpecifier:
         raise NotImplementedError()
 
+    def set_position(self, position: PointSpecifier):
+        print(f"Moving {self} to {position}")
+        self._position = position
+
+    def position(self) -> PointSpecifier:
+        return self._position
+
     def reset(self):
         """Moves the object to its initial position (spawn point)"""
         spawn_point = self.spawn_point()
-        self.position = spawn_point
+        self.set_position(spawn_point)
 
     def __init__(
         self,
@@ -756,9 +763,9 @@ class GameObject(Generic[T]):
         self.reset()
 
     def draw(self):
-        self.current_coordinates = self.position.resolve(self.game)
+        self.current_coordinates = self.position().resolve(self.game)
         # print(self, self.position.resolve(self.game))
-        self.texture.draw_at(self.position)
+        self.texture.draw_at(self.position())
 
     def run_tick_tasks(self):
         for callback in self.tick_tasks:
@@ -783,7 +790,7 @@ class GameObject(Generic[T]):
 
     def collision_box(self) -> Box:
         """Calculates the visual bounding box (i.e. collision box) for this object"""
-        x1, y1 = self.position.calculate_top_left(
+        x1, y1 = self.position().calculate_top_left(
             self.game, self.width(), self.height()
         )
         x2 = x1 + self.width()
@@ -827,7 +834,7 @@ class GameObject(Generic[T]):
         return self.collision_box().is_outside(window)
 
     def coordinates(self):
-        return self.position.resolve(self.game)
+        return self.position().resolve(self.game)
 
     def closest_window_edge(self) -> Edge:
         outer_box = self.game.window_box()
