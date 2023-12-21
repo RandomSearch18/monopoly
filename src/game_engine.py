@@ -179,6 +179,51 @@ class BelowObject(CoordinateSpecifier):
         return coordinate_value + offset
 
 
+class BelowPoint(CoordinateSpecifier):
+    def __init__(
+        self, leader_point: Callable[[], Tuple[float, float]], gap_pixels=0.0
+    ) -> None:
+        self.leader_point = leader_point
+        self.gap_pixels = gap_pixels
+        self.self_edge = START
+
+    def resolve_leader_point(self) -> Tuple[float, float]:
+        leader_point = self.leader_point()
+        return leader_point
+
+    def resolve_unmoved_value(self, outer_size: float) -> float:
+        leader_position = self.resolve_leader_point()
+        _, leader_y = leader_position
+        return leader_y + self.gap_pixels
+
+    def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
+        coordinate_value = self.resolve(outer_size)
+        offset = self.calculate_offest_to_edge(edge, self_length)
+        return coordinate_value + offset
+
+
+class RightOfObject(CoordinateSpecifier):
+    def __init__(self, leader_object: GameObject, gap_pixels: float) -> None:
+        self.leader_object = leader_object
+        self.gap_pixels = gap_pixels
+        self.self_edge = START
+
+    def resolve_unmoved_value(self, outer_size: float) -> float:
+        leader_position = self.leader_object.current_coordinates
+        if not leader_position:
+            raise RuntimeError(
+                f"Can't render an object relative to an object that hasn't been rendered yet ({self.leader_object})!"
+            )
+        leader_position_x, _ = leader_position
+        leader_right = leader_position_x + self.leader_object.width()
+        return leader_right + self.gap_pixels
+
+    def find_edge(self, edge: LineEdge, outer_size: float, self_length: float) -> float:
+        coordinate_value = self.resolve(outer_size)
+        offset = self.calculate_offest_to_edge(edge, self_length)
+        return coordinate_value + offset
+
+
 class CenterAlignedToObject(CoordinateSpecifier):
     def __init__(
         self, leader_object: GameObject, get_leader_object_length: Callable[[], float]
@@ -387,11 +432,11 @@ class Page:
 
     def get_content_start_point(
         self,
-    ) -> Tuple[CoordinateSpecifier, CoordinateSpecifier]:
+    ) -> PointSpecifier:
         if not self.page_header:
-            return (Pixels(0, position=START), Pixels(0, position=START))
+            return PointSpecifier(Pixels(0, position=START), Pixels(0, position=START))
 
-        return (Pixels(0, position=START), BelowObject(self.page_header))
+        return PointSpecifier(Pixels(0, position=START), BelowObject(self.page_header))
 
     def get_content_height(self) -> float:
         page_header = self.page_header
@@ -467,6 +512,9 @@ class Game:
     def set_window_title(self, title_part: str):
         pygame.display.set_caption(f"{title_part} - {self.title}")
 
+    def all_rendered_objects(self) -> list[GameObject]:
+        return [object for object in self.all_objects if object.exists]
+
     def on_event(self, event):
         # print(event)
         if event.type == pygame.QUIT:
@@ -492,7 +540,7 @@ class Game:
             if event.button != 1:
                 # Only trigger for left clicks
                 return
-            for object in self.all_objects:
+            for object in self.all_rendered_objects():
                 if object.collision_box().intersects_with_point(event.pos):
                     # Fire the click event for the object
                     object.events.emit(GameEvent.CLICK, event)
@@ -759,11 +807,12 @@ class GameObject(Generic[T]):
         self.is_solid = solid
         self.spawned_at = pygame.time.get_ticks()
         self.current_coordinates: Tuple[float, float] | None = None
-        self.exists = True
+        self.exists = False
         self.reset()
 
     def draw(self):
         self.current_coordinates = self.position().resolve(self.game)
+        self.exists = True
         # print(self, self.position.resolve(self.game))
         self.texture.draw_at(self.position())
 

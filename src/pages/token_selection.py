@@ -3,9 +3,19 @@ from typing import TYPE_CHECKING
 
 from pygame import Color
 
-from components import Button, Container, Header
+from components import Button, Container, Header, TextObject
 from data_storage import Player
-from game_engine import START, BelowObject, GameObject, Page, Pixels, PointSpecifier
+from game_engine import (
+    START,
+    BelowObject,
+    BelowPoint,
+    Game,
+    GameObject,
+    Page,
+    Pixels,
+    PointSpecifier,
+    RightOfObject,
+)
 
 if TYPE_CHECKING:
     from main import Monopoly
@@ -80,7 +90,7 @@ class PlayerList(Container):
             self.add_player_button = None
 
     def __init__(self, game: Monopoly, page: TokenSelection):
-        spawn_at = PointSpecifier(*page.get_content_start_point())
+        spawn_at = page.get_content_start_point()
         self.page = page
         super().__init__(
             game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT, padding_top=10
@@ -89,9 +99,27 @@ class PlayerList(Container):
         self.tick_tasks.append(self.update_children)
 
 
+class HintText(TextObject):
+    """Displays a hint to the right of the sidebar prompting the user to select a player"""
+
+    def get_spawn_point(self, game: Game, page: TokenSelection) -> PointSpecifier:
+        x = RightOfObject(page.player_list, 10)
+        assert page.page_header
+        y = BelowObject(page.page_header, 10)
+
+        return PointSpecifier(x, y)
+
+    def __init__(self, game: Monopoly, page: TokenSelection):
+        super().__init__(game, self.get_content, self.get_spawn_point(game, page))
+
+    def get_content(self) -> str:
+        return "AAA"
+
+
 class TokenSelection(Page):
     def __init__(self, game: Monopoly) -> None:
         super().__init__(game, "Select a token")
         self.page_header = Header(game)
-
-        self.objects.extend([self.page_header, PlayerList(game, self)])
+        self.player_list = PlayerList(game, self)
+        self.hint_text = HintText(game, self)
+        self.objects.extend([self.page_header, self.player_list, self.hint_text])

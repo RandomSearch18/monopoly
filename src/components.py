@@ -63,8 +63,9 @@ class Container(GameObject["Monopoly"]):
         self, current_child: GameObject
     ) -> GameObject | None:
         """Returns the previous child that was auto-positioned, or None if there is none"""
-        index = self._children.index(current_child)
-        for child in reversed(self._children[:index]):
+        children = self.list_children()
+        index = children.index(current_child)
+        for child in reversed(children[:index]):
             # The child must have been auto-positioned and must still be in the UI
             if isinstance(child.spawn_point(), self.AutoPlacement) and child.exists:
                 return child
@@ -165,7 +166,7 @@ class Header(Container):
         page_title_position = PointSpecifier(
             Pixels(5, position=START), align_to_middle, self_corner=Corner.TOP_LEFT
         )
-        self.page_title_object = Text(
+        self.page_title_object = TextObject(
             game,
             self.get_title_text,
             page_title_position,
@@ -183,7 +184,7 @@ class Header(Container):
         return "Loading"
 
 
-class Text(GameObject):
+class TextObject(GameObject):
     def spawn_point(self) -> PointSpecifier:
         return self.spawn_at
 
