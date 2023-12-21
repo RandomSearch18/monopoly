@@ -193,6 +193,7 @@ class TextObject(GameObject["Monopoly"]):
         game: Monopoly,
         get_content: Callable[[], str],
         spawn_at: PointSpecifier,
+        break_line_at: CoordinateSpecifier | None = None,
         font: Font | None = None,
         color: Color | None = None,
         padding: tuple[float, float] = (0, 0),
@@ -202,7 +203,7 @@ class TextObject(GameObject["Monopoly"]):
         font = font or game.fonts.body()
         super().__init__(
             game=game,
-            texture=TextTexture(game, get_content, font, color, padding),
+            texture=TextTexture(game, get_content, font, break_line_at, color, padding),
         )
 
 

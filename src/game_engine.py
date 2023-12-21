@@ -3,10 +3,11 @@ import copy
 import math
 from collections import deque
 from enum import Enum
+import re
 
 from typing import Callable, Generic, Literal, Optional, Tuple, TypeVar
 import pygame
-from pygame import Color
+from pygame import Color, Surface
 from pygame.rect import Rect
 from pygame.event import Event
 from pygame.font import Font
@@ -647,7 +648,6 @@ class PlainColorTexture(Texture):
         self.game = game
         self.color = color
         self.get_size = get_size
-        initial_width, initial_height = self.get_size()
 
     def width(self) -> float:
         return self.get_size()[0]
@@ -688,14 +688,15 @@ class TextTexture(Texture):
             return (provided_content, default_color)
         return provided_content
 
-    def render_text(
+    def render_text_line(
         self,
+        text_content: str,
+        text_color: Color,
         start_x: float,
         start_y: float,
         padding: Tuple[float, float],
     ):
-        """Computes a surface and bounding box for the text, but doesn't draw it to the screen"""
-        text_content, text_color = self.get_content()
+        """Computes a surface and bounding box for a line of, but doesn't draw it to the screen"""
         use_antialiasing = True
         text_surface = self.font.render(text_content, use_antialiasing, text_color)
 
@@ -710,8 +711,99 @@ class TextTexture(Texture):
 
         return text_surface, outer_box, text_rect
 
+    def render_text(self, start_x: float, start_y: float):
+        """Renders a line of text the old way"""
+        text_content, text_color = self.get_content()
+        padding = self.get_padding()
+        return self.render_text_line(
+            text_content, text_color, start_x, start_y, padding
+        )
+
+    def split_text(self, text: str, max_width: float, font: Font):
+        """Splits the provides string into lines by applying word wrapping
+
+        - Each line will be no longer than max_width
+        - Uses pygame.font.Font.size() to determine how wide the text will be
+        - Source: Written by GitHub Copilot
+        """
+        words = re.split(r"\s", text)
+        lines = []
+        current_line = ""
+        for word in words:
+            if not current_line:
+                current_line = word
+                continue
+            current_line += " " + word
+            text_width, _ = font.size(current_line)
+            if text_width > max_width:
+                # The current line is too long, so start a new one
+                lines.append(current_line)
+                current_line = word
+        if current_line:
+            lines.append(current_line)
+        return lines
+
+    def render_wrapped_text(
+        self, top_left: Tuple[float, float], padding: Tuple[float, float]
+    ) -> tuple[Surface, Box, Rect]:
+        start_x, start_y = top_left
+        text_content, text_color = self.get_content()
+        if not self.break_line_at:
+            return self.render_text_line(
+                text_content, text_color, start_x, start_y, padding
+            )
+        break_at_x = self.break_line_at.resolve(self.game.width())
+        max_width = break_at_x - start_x
+
+        lines = self.split_text(text_content, max_width, self.font)
+
+        # Render each line
+        rendered_lines: list[tuple[Surface, Box, Rect]] = []
+        line_top = start_y
+        for line in lines:
+            surface, outer_box, text_rect = self.render_text_line(
+                line, text_color, start_x, start_y, padding=(0, 0)
+            )
+            rendered_lines.append((surface, outer_box, text_rect))
+            line_top += outer_box.height
+
+        # Calculate the bounding box for the entire text block
+        total_height = sum([box.height for _, box, _ in rendered_lines])
+        total_width = max([box.width for _, box, _ in rendered_lines])
+        # total_inner_box = Box(
+        #     start_x, start_y, start_x + total_width, start_y + total_height
+        # )
+
+        # Create a surface for the text block
+        # The SRCALPHA flag makes it use per-pixel transparency
+        text_surface = Surface((total_width, total_height), pygame.SRCALPHA)
+
+        # Draw each line onto the text surface
+        current_line_top = 0
+        for surface, outer_box, text_rect in rendered_lines:
+            text_surface.blit(surface, (0, current_line_top))
+            current_line_top += outer_box.height
+
+        # Calculate the outer box for the text block (including padding)
+        text_rect = text_surface.get_rect()
+        text_rect.left = math.floor(start_x)
+        text_rect.top = math.floor(start_y)
+        padding_x, padding_y = padding
+        outer_box = Box.from_rect(text_rect)
+        outer_box.enlarge_by_x(padding_x)
+        outer_box.enlarge_by_y(padding_y)
+
+        # For debugging:
+        pygame.draw.rect(self.game.surface, "yellow", text_rect)
+        self.game.surface.blit(rendered_lines[0][0], text_rect)
+
+        return text_surface, outer_box, text_rect
+
     def get_dummy_bounding_boxes(self):
-        _, outer_box, text_rect = self.render_text(0, 0, self.get_padding())
+        text_content, text_color = self.get_content()
+        _, outer_box, text_rect = self.render_text_line(
+            text_content, text_color, 0, 0, self.get_padding()
+        )
         return outer_box, text_rect
 
     def __init__(
@@ -719,6 +811,7 @@ class TextTexture(Texture):
         game: Game,
         get_content: Callable[[], str | Tuple[str, Color]],
         font: pygame.font.Font,
+        break_line_at: CoordinateSpecifier | None = None,
         default_color: Color | None = None,
         padding: Tuple[float, float] = (0, 0),
     ):
@@ -727,6 +820,7 @@ class TextTexture(Texture):
         self.font = font
         self._padding = padding
         self.default_color = default_color
+        self.break_line_at = break_line_at
         # Before first render, use bboxes that are the correct size but at an arbitrary position.
         # This is becuase we might need to use the bbox size to resolve its spawn position
         self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
@@ -738,11 +832,11 @@ class TextTexture(Texture):
         return self._padding
 
     def draw_at(self, position: PointSpecifier):
-        start_x, start_y = position.calculate_top_left(
+        top_left = position.calculate_top_left(
             self.game, self.inner_width(), self.inner_height()
         )
         padding = self.get_padding()
-        text_surface, outer_box, text_rect = self.render_text(start_x, start_y, padding)
+        text_surface, outer_box, text_rect = self.render_wrapped_text(top_left, padding)
         self.current_outer_box = outer_box
         self.current_text_rect = text_rect
         background = self.get_background_color()

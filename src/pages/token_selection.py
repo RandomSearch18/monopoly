@@ -12,6 +12,7 @@ from game_engine import (
     Game,
     GameObject,
     Page,
+    Percent,
     Pixels,
     PointSpecifier,
     RightOfObject,
@@ -110,16 +111,19 @@ class HintText(TextObject):
         return PointSpecifier(x, y)
 
     def __init__(self, game: Monopoly, page: TokenSelection):
-        super().__init__(game, self.get_content, self.get_spawn_point(game, page))
+        super().__init__(
+            game,
+            self.get_content,
+            self.get_spawn_point(game, page),
+            break_line_at=Percent(1.0),
+        )
 
     def get_content(self) -> str:
         current_game = self.game.current_game
         if not current_game:
             return "Load a saved game or start a new one first!"  # This should never end up being shown in-game
         if not current_game.data.players:
-            return (
-                "Get the game started by adding players using the button on the left."
-            )
+            return "Get the game started by adding players with the button on the left."
         if not current_game.data.any_players_have_chosen_tokens():
             return "Click on a player in the sidebar to customise their token."
         # This should never get shown either:
