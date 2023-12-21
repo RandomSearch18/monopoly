@@ -624,15 +624,14 @@ class Game:
 
 
 class Texture:
-    def __init__(self, width, height):
-        self.base_width = width
-        self.base_height = height
+    def __init__(self):
+        pass
 
     def height(self) -> float:
-        return self.base_height
+        raise NotImplementedError()
 
     def width(self) -> float:
-        return self.base_width
+        raise NotImplementedError()
 
     def draw_at(self, position: PointSpecifier):
         pass
@@ -649,7 +648,6 @@ class PlainColorTexture(Texture):
         self.color = color
         self.get_size = get_size
         initial_width, initial_height = self.get_size()
-        super().__init__(initial_width, initial_height)
 
     def width(self) -> float:
         return self.get_size()[0]
@@ -729,8 +727,9 @@ class TextTexture(Texture):
         self.font = font
         self._padding = padding
         self.default_color = default_color
+        # Before first render, use bboxes that are the correct size but at an arbitrary position.
+        # This is becuase we might need to use the bbox size to resolve its spawn position
         self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
-        super().__init__(self.width(), self.height())
 
     def get_background_color(self) -> Color | None:
         return None
@@ -756,10 +755,6 @@ class ImageTexture(Texture):
     def __init__(self, game, image):
         self.game = game
         self.image = image
-
-        width = self.image.get_width()
-        height = self.image.get_height()
-        super().__init__(width, height)
 
     def draw_at(self, position: PointSpecifier):
         start_x, start_y = position.calculate_top_left(
