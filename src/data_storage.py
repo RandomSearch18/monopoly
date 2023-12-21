@@ -19,6 +19,11 @@ class Token(Enum):
 class Player(BaseModel):
     nickname: str
     token: Token
+    has_manually_selected_token: bool = False
+
+    def set_token(self, token: Token):
+        self.token = token
+        self.has_manually_selected_token = True
 
     def __str__(self) -> str:
         return self.nickname
@@ -53,6 +58,9 @@ class SavedGameData(BaseModel):
 
     def get_free_player_slots(self) -> int:
         return self.get_max_players() - len(self.players)
+
+    def any_players_have_chosen_tokens(self) -> bool:
+        return any(player.has_manually_selected_token for player in self.players)
 
     def __str__(self):
         return self.started_at.strftime("Game<%Y-%m-%d %H:%M:%S>")

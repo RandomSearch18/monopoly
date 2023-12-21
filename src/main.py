@@ -35,7 +35,7 @@ class MonopolyFonts(Fonts):
         return self.system_font(4)
 
     def body(self) -> Font:
-        return self.system_font(1)
+        return self.system_font(1.75)
 
     def button(self) -> Font:
         return self.system_font(2)
@@ -88,10 +88,10 @@ class Monopoly(Game):
     fonts: MonopolyFonts
 
     def __init__(self):
+        self.current_game = None
         super().__init__(60, MonopolyTheme(), MonopolyFonts(), "Monopoly", (800, 600))
         self.title_screen = TitleScreen(self)
         self.token_selection = TokenSelection(self)
-        self.current_game = None
 
     def get_initial_page(self):
         return self.title_screen

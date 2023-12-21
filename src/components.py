@@ -184,7 +184,7 @@ class Header(Container):
         return "Loading"
 
 
-class TextObject(GameObject):
+class TextObject(GameObject["Monopoly"]):
     def spawn_point(self) -> PointSpecifier:
         return self.spawn_at
 
@@ -197,6 +197,7 @@ class TextObject(GameObject):
         color: Color | None = None,
         padding: tuple[float, float] = (0, 0),
     ) -> None:
+        self.game = game
         self.spawn_at = spawn_at
         font = font or game.fonts.body()
         super().__init__(

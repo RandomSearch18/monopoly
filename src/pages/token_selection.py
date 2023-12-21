@@ -113,12 +113,22 @@ class HintText(TextObject):
         super().__init__(game, self.get_content, self.get_spawn_point(game, page))
 
     def get_content(self) -> str:
-        return "AAA"
+        current_game = self.game.current_game
+        if not current_game:
+            return "Load a saved game or start a new one first!"  # This should never end up being shown in-game
+        if not current_game.data.players:
+            return (
+                "Get the game started by adding players using the button on the left."
+            )
+        if not current_game.data.any_players_have_chosen_tokens():
+            return "Click on a player in the sidebar to customise their token."
+        # This should never get shown either:
+        return "Start the game once everyone's ready!"
 
 
 class TokenSelection(Page):
     def __init__(self, game: Monopoly) -> None:
-        super().__init__(game, "Select a token")
+        super().__init__(game, "Choose tokens")
         self.page_header = Header(game)
         self.player_list = PlayerList(game, self)
         self.hint_text = HintText(game, self)
