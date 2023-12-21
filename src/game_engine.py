@@ -711,14 +711,6 @@ class TextTexture(Texture):
 
         return text_surface, outer_box, text_rect
 
-    def render_text(self, start_x: float, start_y: float):
-        """Renders a line of text the old way"""
-        text_content, text_color = self.get_content()
-        padding = self.get_padding()
-        return self.render_text_line(
-            text_content, text_color, start_x, start_y, padding
-        )
-
     def split_text(self, text: str, max_width: float, font: Font):
         """Splits the provides string into lines by applying word wrapping
 
@@ -770,9 +762,6 @@ class TextTexture(Texture):
         # Calculate the bounding box for the entire text block
         total_height = sum([box.height for _, box, _ in rendered_lines])
         total_width = max([box.width for _, box, _ in rendered_lines])
-        # total_inner_box = Box(
-        #     start_x, start_y, start_x + total_width, start_y + total_height
-        # )
 
         # Create a surface for the text block
         # The SRCALPHA flag makes it use per-pixel transparency
@@ -792,10 +781,6 @@ class TextTexture(Texture):
         outer_box = Box.from_rect(text_rect)
         outer_box.enlarge_by_x(padding_x)
         outer_box.enlarge_by_y(padding_y)
-
-        # For debugging:
-        pygame.draw.rect(self.game.surface, "yellow", text_rect)
-        self.game.surface.blit(rendered_lines[0][0], text_rect)
 
         return text_surface, outer_box, text_rect
 
