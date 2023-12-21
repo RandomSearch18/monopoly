@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable, Tuple
 
 from pygame import Color
 from pygame.font import Font
-from events import Event
+from events import GameEvent
 from game_engine import (
     CENTER,
     START,
@@ -97,13 +97,13 @@ class Container(GameObject["Monopoly"]):
             # Marks the object as needing its auto-placement resolved
             print(f"Container: Re-resolving auto placement for {object}")
             object.set_position(object.spawn_point())
-            object.events.remove_listener(Event.OBJECT_REMOVE, event_listener)
+            object.events.remove_listener(GameEvent.OBJECT_REMOVE, event_listener)
             self.resolve_auto_placement(object)
 
         if previous_object:
             # Re-resolve the auto placement for this object if its designated previous object is removed
             event_listener = previous_object.events.on(
-                Event.OBJECT_REMOVE, resolve_auto_placement_again
+                GameEvent.OBJECT_REMOVE, resolve_auto_placement_again
             )
 
         object.set_position(spawn_below_previous_object())
@@ -123,7 +123,7 @@ class Container(GameObject["Monopoly"]):
     def remove_all_children(self):
         for child in self._children:
             child.exists = False
-            child.events.emit(Event.OBJECT_REMOVE)
+            child.events.emit(GameEvent.OBJECT_REMOVE)
             self.game.all_objects.remove(child)
         self._children.clear()
 
@@ -132,7 +132,7 @@ class Container(GameObject["Monopoly"]):
 
     def remove_child(self, child: GameObject):
         child.exists = False
-        child.events.emit(Event.OBJECT_REMOVE)
+        child.events.emit(GameEvent.OBJECT_REMOVE)
         self._children.remove(child)
         self.game.all_objects.remove(child)
 
@@ -259,7 +259,7 @@ class Button(GameObject):
             game, self, self.get_content, self.font, Color("green")
         )
         super().__init__(game, self.texture)
-        self.on_click_tasks.append(self.run_callback)
+        self.events.on(GameEvent.CLICK, self.run_callback)
 
     def run_callback(self, _):
         self.callback()

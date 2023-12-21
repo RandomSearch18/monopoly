@@ -11,7 +11,7 @@ from pygame.rect import Rect
 from pygame.event import Event
 from pygame.font import Font
 
-from events import EventEmitter
+from events import EventEmitter, GameEvent
 
 
 class Corner(Enum):
@@ -489,11 +489,13 @@ class Game:
 
         # Mouse clicks
         elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button != 1:
+                # Only trigger for left clicks
+                return
             for object in self.all_objects:
                 if object.collision_box().intersects_with_point(event.pos):
-                    # Run any on-click callbacks for the object
-                    for callback in object.on_click_tasks:
-                        callback(event)
+                    # Fire the click event for the object
+                    object.events.emit(GameEvent.CLICK, event)
 
     def trigger_key_action(self, action: str, event: pygame.event.Event):
         if action not in self.key_action_callbacks:
@@ -753,7 +755,6 @@ class GameObject(Generic[T]):
         self.game: T = game
         self.events = EventEmitter()
         self.tick_tasks: list[Callable] = []
-        self.on_click_tasks: list[Callable[[Event], None]] = []
         self.texture = texture
         self.is_solid = solid
         self.spawned_at = pygame.time.get_ticks()
