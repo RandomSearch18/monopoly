@@ -413,42 +413,6 @@ class Fonts:
         raise NotImplementedError()
 
 
-class Page:
-    """A page is a self-contained view containing its own set of objects"""
-
-    def __init__(self, game: Game, title: str) -> None:
-        self.game = game
-        self.objects: list[GameObject] = []
-        self.title = title
-        self.page_header: GameObject | None = None
-
-    def activate(self):
-        if self.title:
-            self.game.set_window_title(self.title)
-        self.game.active_page = self
-        # Replace active game objects with our objects:
-        self.game.all_objects.clear()
-        self.game.top_level_objects.clear()
-        self.game.add_objects(*self.objects)
-
-    def get_content_start_point(
-        self,
-    ) -> PointSpecifier:
-        if not self.page_header:
-            return PointSpecifier(Pixels(0, position=START), Pixels(0, position=START))
-
-        return PointSpecifier(Pixels(0, position=START), BelowObject(self.page_header))
-
-    def get_content_height(self) -> float:
-        page_header = self.page_header
-        if not page_header:
-            return self.game.height()
-        return self.game.height() - page_header.height()
-
-    def get_content_width(self) -> float:
-        return self.game.width()
-
-
 class Game:
     def __init__(
         self,
@@ -489,6 +453,10 @@ class Game:
     def add_objects(self, *objects: GameObject):
         self.all_objects.extend(objects)
         self.top_level_objects.extend(objects)
+
+    def remove_object(self, object: GameObject):
+        self.all_objects.remove(object)
+        self.top_level_objects.remove(object)
 
     def get_initial_page(self) -> Page:
         raise NotImplementedError()
@@ -622,6 +590,53 @@ class Game:
         self.top_level_objects.clear()
         self.key_action_callbacks.clear()
         self.key_up_callbacks.clear()
+
+
+T = TypeVar("T", bound=Game)
+
+
+class Page(Generic[T]):
+    """A page is a self-contained view containing its own set of objects"""
+
+    def __init__(self, game: T, title: str) -> None:
+        self.game = game
+        self._objects: list[GameObject[T]] = []
+        self.title = title
+        self.page_header: GameObject[T] | None = None
+
+    def activate(self):
+        if self.title:
+            self.game.set_window_title(self.title)
+        self.game.active_page = self
+        # Replace active game objects with our objects:
+        self.game.all_objects.clear()
+        self.game.top_level_objects.clear()
+        self.game.add_objects(*self._objects)
+
+    def add_objects(self, *objects: GameObject[T]):
+        self._objects.extend(objects)
+        self.game.add_objects(*objects)
+
+    def remove_object(self, object: GameObject[T]):
+        self._objects.remove(object)
+        self.game.remove_object(object)
+
+    def get_content_start_point(
+        self,
+    ) -> PointSpecifier:
+        if not self.page_header:
+            return PointSpecifier(Pixels(0, position=START), Pixels(0, position=START))
+
+        return PointSpecifier(Pixels(0, position=START), BelowObject(self.page_header))
+
+    def get_content_height(self) -> float:
+        page_header = self.page_header
+        if not page_header:
+            return self.game.height()
+        return self.game.height() - page_header.height()
+
+    def get_content_width(self) -> float:
+        return self.game.width()
 
 
 class Texture:
@@ -845,9 +860,6 @@ class ImageTexture(Texture):
             self.game, self.width(), self.height()
         )
         self.game.surface.blit(self.image, (start_x, start_y))
-
-
-T = TypeVar("T", bound=Game)
 
 
 class GameObject(Generic[T]):

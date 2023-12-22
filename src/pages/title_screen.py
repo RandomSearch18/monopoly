@@ -22,9 +22,7 @@ class TitleScreen(Page):
             PercentagePoint(0.5, 0.25),
         )
 
-        self.objects.extend(
-            [
-                self.page_header,
-                self.start_button,
-            ]
+        self.add_objects(
+            self.page_header,
+            self.start_button,
         )

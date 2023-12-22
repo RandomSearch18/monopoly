@@ -34,6 +34,9 @@ class MonopolyFonts(Fonts):
     def title(self) -> Font:
         return self.system_font(4)
 
+    def heading(self) -> Font:
+        return self.system_font(2.5)
+
     def body(self) -> Font:
         return self.system_font(1.75)
 

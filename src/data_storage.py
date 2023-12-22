@@ -25,6 +25,9 @@ class Player(BaseModel):
         self.token = token
         self.has_manually_selected_token = True
 
+    def get_nickname(self) -> str:
+        return self.nickname
+
     def __str__(self) -> str:
         return self.nickname
 

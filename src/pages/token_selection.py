@@ -28,14 +28,15 @@ if TYPE_CHECKING:
 class PlayerListItem(Button):
     """A clickable entry in the player list"""
 
-    def __init__(self, game: Monopoly, player: Player):
+    def __init__(self, game: Monopoly, page: TokenSelection, player: Player):
         super().__init__(
             game, player.nickname, self.on_click, Container.AutoPlacement(5)
         )
+        self.page = page
         self.player = player
 
     def on_click(self):
-        print(f"Clicked on {self.player}")
+        self.page.show_token_selection_pane(self.player)
 
 
 class PlayerList(Container):
@@ -66,7 +67,7 @@ class PlayerList(Container):
             if player not in [child.player for child in existing_player_items]:
                 # Add a child for this player, as it aren't in the UI yet
                 print(f"PlayerList: Adding list item for {player}")
-                self.add_children(PlayerListItem(self.game, player))
+                self.add_children(PlayerListItem(self.game, self.page, player))
         for child in existing_player_items:
             if child.player not in current_game.data.players:
                 # Remove this child from the UI, as the corrresponding player doesn't exist anymore
@@ -122,21 +123,36 @@ class PlayerList(Container):
         self.tick_tasks.append(self.update_children)
 
 
+class TokenSelectionPane(Container):
+    def get_size(self) -> tuple[float, float]:
+        total_height = sum(child.height() for child in self.list_children())
+        widest_child = self.get_widest_child()
+        total_width = widest_child.width() if widest_child else 0
+        return total_width, total_height
+
+    def __init__(self, game: Monopoly, page: TokenSelection, player: Player):
+        self.player = player
+        self.page = page
+        super().__init__(game, page.get_main_pane_start_point(), self.get_size)
+
+        self.heading = TextObject(
+            self.game,
+            self.player.get_nickname,
+            Container.AutoPlacement(),
+            break_line_at=Percent(1.0),
+            font=self.game.fonts.heading(),
+        )
+        self.add_children(self.heading)
+
+
 class HintText(TextObject):
     """Displays a hint to the right of the sidebar prompting the user to select a player"""
-
-    def get_spawn_point(self, game: Game, page: TokenSelection) -> PointSpecifier:
-        x = RightOfObject(page.player_list, 10)
-        assert page.page_header
-        y = BelowObject(page.page_header, 10)
-
-        return PointSpecifier(x, y)
 
     def __init__(self, game: Monopoly, page: TokenSelection):
         super().__init__(
             game,
             self.get_content,
-            self.get_spawn_point(game, page),
+            page.get_main_pane_start_point(),
             break_line_at=Percent(1.0),
         )
 
@@ -152,10 +168,28 @@ class HintText(TextObject):
         return "Start the game once everyone's ready!"
 
 
-class TokenSelection(Page):
+class TokenSelection(Page["Monopoly"]):
     def __init__(self, game: Monopoly) -> None:
         super().__init__(game, "Choose tokens")
         self.page_header = Header(game)
         self.player_list = PlayerList(game, self)
         self.hint_text = HintText(game, self)
-        self.objects.extend([self.page_header, self.player_list, self.hint_text])
+        self.token_selection_pane: TokenSelectionPane | None = None
+        self.add_objects(self.page_header, self.player_list, self.hint_text)
+
+    def get_main_pane_start_point(self) -> PointSpecifier:
+        x = RightOfObject(self.player_list, 10)
+        assert self.page_header
+        y = BelowObject(self.page_header, 10)
+
+        return PointSpecifier(x, y)
+
+    def show_token_selection_pane(self, player: Player):
+        if self.token_selection_pane:
+            self.remove_object(self.token_selection_pane)
+            self.token_selection_pane = None
+        if self.hint_text:
+            self.remove_object(self.hint_text)
+            self.hint_text = None
+        self.token_selection_pane = TokenSelectionPane(self.game, self, player)
+        self.add_objects(self.token_selection_pane)

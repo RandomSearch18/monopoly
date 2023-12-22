@@ -142,11 +142,26 @@ class Container(GameObject["Monopoly"]):
             child.run_tick_tasks()
 
     def get_widest_child(self) -> GameObject | None:
+        """Find the child with the greatest total width, or None if there are no children"""
         widest_child = None
         for child in self._children:
             if widest_child is None or child.width() > widest_child.width():
                 widest_child = child
         return widest_child
+
+    def get_tallest_child(self) -> GameObject | None:
+        tallest_child = None
+        for child in self._children:
+            if tallest_child is None or child.height() > tallest_child.height():
+                tallest_child = child
+        return tallest_child
+
+    # def calculate_content_size(self) -> tuple[float, float]:
+    #     widest_child = self.get_widest_child()
+    #     tallest_child = self.get_tallest_child()
+    #     if tallest_child is None or widest_child is None:
+    #         return (0, 0)
+    #     return (widest_child.width(), tallest_child.height())
 
 
 class Header(Container):
