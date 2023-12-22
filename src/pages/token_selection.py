@@ -142,7 +142,16 @@ class TokenSelectionPane(Container):
             break_line_at=Percent(1.0),
             font=self.game.fonts.heading(),
         )
-        self.add_children(self.heading)
+        description_text = (
+            f"Select a token for {self.player} by clicking one of the options below."
+        )
+        self.description = TextObject(
+            self.game,
+            lambda: description_text,
+            Container.AutoPlacement(5),
+            break_line_at=Percent(1.0),
+        )
+        self.add_children(self.heading, self.description)
 
 
 class HintText(TextObject):

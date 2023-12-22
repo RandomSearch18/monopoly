@@ -29,7 +29,7 @@ class Player(BaseModel):
         return self.nickname
 
     def __str__(self) -> str:
-        return self.nickname
+        return self.get_nickname()
 
 
 class SavedGameData(BaseModel):
