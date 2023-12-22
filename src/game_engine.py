@@ -902,7 +902,9 @@ class GameObject(Generic[T]):
         self.reset()
 
     def draw(self):
-        self.current_coordinates = self.position().resolve(self.game)
+        self.current_coordinates = self.position().calculate_top_left(
+            self.game, self.width(), self.height()
+        )
         self.exists = True
         # print(self, self.position.resolve(self.game))
         self.texture.draw_at(self.position())

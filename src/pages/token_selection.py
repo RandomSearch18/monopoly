@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from pygame import Color
 
 from components import Button, Container, Header, TextObject
-from data_storage import Player
+from data_storage import Player, Token
 from game_engine import (
     END,
     START,
@@ -123,12 +123,44 @@ class PlayerList(Container):
         self.tick_tasks.append(self.update_children)
 
 
+class TokenSelectionButtons(Container):
+    def get_size(self) -> tuple[float, float]:
+        total_height = sum(child.height() for child in self.list_children())
+        widest_child = self.get_widest_child()
+        total_width = widest_child.width() if widest_child else 0
+        return total_width, total_height
+
+    def __init__(
+        self,
+        game: Monopoly,
+        page: TokenSelection,
+        spawn_at: PointSpecifier,
+        on_token_selection: Callable[[Token], None],
+    ):
+        self.page = page
+        super().__init__(game, spawn_at, self.get_size)
+        self.on_token_selection = on_token_selection
+        token_buttons = [
+            Button(
+                game,
+                token.value.capitalize(),
+                lambda token=token: self.on_token_selection(token),
+                Container.AutoPlacement(5),
+            )
+            for token in Token
+        ]
+        self.add_children(*token_buttons)
+
+
 class TokenSelectionPane(Container):
     def get_size(self) -> tuple[float, float]:
         total_height = sum(child.height() for child in self.list_children())
         widest_child = self.get_widest_child()
         total_width = widest_child.width() if widest_child else 0
         return total_width, total_height
+
+    def on_token_selection(self, token: Token):
+        print(f"TokenSelectionPane: {self.player} selected {token}")
 
     def __init__(self, game: Monopoly, page: TokenSelection, player: Player):
         self.player = player
@@ -151,7 +183,17 @@ class TokenSelectionPane(Container):
             Container.AutoPlacement(5),
             break_line_at=Percent(1.0),
         )
-        self.add_children(self.heading, self.description)
+        self.token_selection_buttons = TokenSelectionButtons(
+            self.game,
+            self.page,
+            PointSpecifier(
+                CenterAlignedToObject(self, self.width),
+                BelowObject(self.description, 5),
+                self_corner=Corner.TOP_RIGHT,
+            ),
+            self.on_token_selection,
+        )
+        self.add_children(self.heading, self.description, self.token_selection_buttons)
 
 
 class HintText(TextObject):
