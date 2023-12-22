@@ -718,9 +718,10 @@ class TextTexture(Texture):
         - Uses pygame.font.Font.size() to determine how wide the text will be
         - Source: Written by GitHub Copilot
         """
-        words = re.split(r"\s", text)
+        words = re.split(r"\s+", text)
         lines = []
-        current_line = ""
+        acceptable_line = ""  # A line that we can guarantee will fit
+        current_line = ""  # The line that we use to test if it fits
         for word in words:
             if not current_line:
                 current_line = word
@@ -728,11 +729,14 @@ class TextTexture(Texture):
             current_line += " " + word
             text_width, _ = font.size(current_line)
             if text_width > max_width:
-                # The current line is too long, so start a new one
-                lines.append(current_line)
+                # The current line is too long, so use the acceptable_line from last iteration
+                lines.append(acceptable_line)
                 current_line = word
+            else:
+                # The current line fits
+                acceptable_line = current_line
         if current_line:
-            lines.append(current_line)
+            lines.append(current_line.lstrip())
         return lines
 
     def render_wrapped_text(
