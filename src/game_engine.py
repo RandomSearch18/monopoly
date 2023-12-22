@@ -730,12 +730,13 @@ class TextTexture(Texture):
             text_width, _ = font.size(current_line)
             if text_width > max_width:
                 # The current line is too long, so use the acceptable_line from last iteration
-                lines.append(acceptable_line)
+                lines.append(acceptable_line.lstrip())
                 current_line = word
             else:
                 # The current line fits
                 acceptable_line = current_line
         if current_line:
+            # Add the final line
             lines.append(current_line.lstrip())
         return lines
 
