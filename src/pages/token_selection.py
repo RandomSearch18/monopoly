@@ -6,9 +6,12 @@ from pygame import Color
 from components import Button, Container, Header, TextObject
 from data_storage import Player
 from game_engine import (
+    END,
     START,
     BelowObject,
     BelowPoint,
+    CenterAlignedToObject,
+    Corner,
     Game,
     GameObject,
     Page,
@@ -90,6 +93,24 @@ class PlayerList(Container):
             self.remove_child(self.add_player_button)
             self.add_player_button = None
 
+        if current_game.data.ready_to_start() and not self.start_game_button:
+            print(f"PlayerList: Adding start-game button")
+            self.start_game_button = Button(
+                self.game,
+                "Start game",
+                print,
+                PointSpecifier(
+                    CenterAlignedToObject(self, self.width),
+                    Pixels(10, outer_edge=END, position=END),
+                ),
+            )
+            self.add_children(self.start_game_button)
+
+        if self.start_game_button and not current_game.data.ready_to_start():
+            print(f"PlayerList: Removing start-game button")
+            self.remove_child(self.start_game_button)
+            self.start_game_button = None
+
     def __init__(self, game: Monopoly, page: TokenSelection):
         spawn_at = page.get_content_start_point()
         self.page = page
@@ -97,6 +118,7 @@ class PlayerList(Container):
             game, spawn_at, self.get_size, game.theme.BACKGROUND_ACCENT, padding_top=10
         )
         self.add_player_button: Button | None = None
+        self.start_game_button: Button | None = None
         self.tick_tasks.append(self.update_children)
 
 

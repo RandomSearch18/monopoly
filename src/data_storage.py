@@ -34,6 +34,7 @@ class SavedGameData(BaseModel):
     is_saved_to_disk: bool
     players: list[Player]
     max_player_count: int = 6
+    min_player_count: int = 2
 
     def get_unused_tokens(self) -> list[Token]:
         return [
@@ -56,11 +57,18 @@ class SavedGameData(BaseModel):
         available_tokens_count = len(Token)
         return min(available_tokens_count, self.max_player_count)
 
+    def get_min_players(self) -> int:
+        return self.min_player_count
+
     def get_free_player_slots(self) -> int:
         return self.get_max_players() - len(self.players)
 
     def any_players_have_chosen_tokens(self) -> bool:
         return any(player.has_manually_selected_token for player in self.players)
+
+    def ready_to_start(self) -> bool:
+        player_count = len(self.players)
+        return self.get_min_players() <= player_count <= self.get_max_players()
 
     def __str__(self):
         return self.started_at.strftime("Game<%Y-%m-%d %H:%M:%S>")
