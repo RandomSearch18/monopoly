@@ -718,7 +718,7 @@ class TextTexture(Texture):
         - Uses pygame.font.Font.size() to determine how wide the text will be
         - Source: Written by GitHub Copilot
         """
-        words = re.split(r"\s+", text)
+        words = re.split(r"(\s+)", text)
         lines = []
         acceptable_line = ""  # A line that we can guarantee will fit
         current_line = ""  # The line that we use to test if it fits
@@ -726,7 +726,7 @@ class TextTexture(Texture):
             if not current_line:
                 current_line = word
                 continue
-            current_line += " " + word
+            current_line += word
             text_width, _ = font.size(current_line)
             if text_width > max_width:
                 # The current line is too long, so use the acceptable_line from last iteration
