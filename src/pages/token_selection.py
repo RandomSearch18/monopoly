@@ -1,19 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
 
-from pygame import Color
-
 from components import Button, Container, Header, TextObject
 from data_storage import Player, Token
+from events import GameEvent
 from game_engine import (
     END,
-    START,
     BelowObject,
-    BelowPoint,
     CenterAlignedToObject,
     Corner,
-    Game,
-    GameObject,
     Page,
     Percent,
     Pixels,
@@ -22,7 +17,7 @@ from game_engine import (
 )
 
 if TYPE_CHECKING:
-    from main import Monopoly
+    from main import Monopoly, SavedGameManager
 
 
 class PlayerListItem(Button):
@@ -54,8 +49,7 @@ class PlayerList(Container):
         current_game = self.game.current_game
         assert current_game
         initial_name = current_game.data.get_next_default_player_name()
-        initial_token = current_game.data.get_unused_token()
-        current_game.add_player(Player(nickname=initial_name, token=initial_token))
+        current_game.add_player(Player(nickname=initial_name))
 
     def update_children(self):
         current_game = self.game.current_game
@@ -140,14 +134,30 @@ class TokenSelectionButtons(Container):
         self.page = page
         super().__init__(game, spawn_at, self.get_size)
         self.on_token_selection = on_token_selection
+        self.events.on(GameEvent.BEFORE_SPAWN, self.on_spawn)
+
+    def generate_token_button(self, current_game: SavedGameManager, token: Token):
+        def on_click(token=token):
+            return self.on_token_selection(token)
+
+        def is_disabled(token=token):
+            return current_game is not None and token in [
+                player.token for player in current_game.data.players
+            ]
+
+        return Button(
+            self.game,
+            token.name.capitalize(),
+            on_click,
+            Container.AutoPlacement(5),
+            is_disabled=is_disabled,
+        )
+
+    def on_spawn(self):
+        current_game = self.game.current_game
+        assert current_game
         token_buttons = [
-            Button(
-                game,
-                token.value.capitalize(),
-                lambda token=token: self.on_token_selection(token),
-                Container.AutoPlacement(5),
-            )
-            for token in Token
+            self.generate_token_button(current_game, token) for token in Token
         ]
         self.add_children(*token_buttons)
 
@@ -161,6 +171,7 @@ class TokenSelectionPane(Container):
 
     def on_token_selection(self, token: Token):
         print(f"TokenSelectionPane: {self.player} selected {token}")
+        self.player.set_token(token)
 
     def __init__(self, game: Monopoly, page: TokenSelection, player: Player):
         self.player = player

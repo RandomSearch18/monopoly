@@ -905,7 +905,9 @@ class GameObject(Generic[T]):
         self.current_coordinates = self.position().calculate_top_left(
             self.game, self.width(), self.height()
         )
-        self.exists = True
+        if not self.exists:
+            self.exists = True
+            self.events.emit(GameEvent.BEFORE_SPAWN)
         # print(self, self.position.resolve(self.game))
         self.texture.draw_at(self.position())
 

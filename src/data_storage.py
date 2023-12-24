@@ -1,3 +1,4 @@
+from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 import random
@@ -18,12 +19,10 @@ class Token(Enum):
 
 class Player(BaseModel):
     nickname: str
-    token: Token
-    has_manually_selected_token: bool = False
+    token: Token | None = None
 
-    def set_token(self, token: Token):
-        self.token = token
-        self.has_manually_selected_token = True
+    def set_token(self, game_token: Token):
+        self.token = game_token
 
     def get_nickname(self) -> str:
         return self.nickname
@@ -67,7 +66,7 @@ class SavedGameData(BaseModel):
         return self.get_max_players() - len(self.players)
 
     def any_players_have_chosen_tokens(self) -> bool:
-        return any(player.has_manually_selected_token for player in self.players)
+        return any(player.token for player in self.players)
 
     def ready_to_start(self) -> bool:
         player_count = len(self.players)

@@ -4,6 +4,7 @@ from enum import Enum
 class GameEvent(Enum):
     CLICK = "click"
     OBJECT_REMOVE = "object_remove"
+    BEFORE_SPAWN = "before_first_draw"
 
 
 class EventEmitter:

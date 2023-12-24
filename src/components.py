@@ -230,15 +230,22 @@ class ButtonTexture(TextTexture):
         get_content: Callable[[], str | Tuple[str, Color]],
         font: Font,
         base_color: Color,
+        is_disabled: Callable[[], bool],
     ):
         super().__init__(game, get_content, font)
         self.button = object
         self.base_color = base_color
+        self.is_disabled = is_disabled
 
     def get_background_color(self) -> Color | None:
         # Lighten the color if the button is hovered or pressed
         hover_color = self.base_color.lerp("white", 0.4)
         pressed_color = self.base_color.lerp("white", 0.6)
+        # Apply 50% opacity if the button is disabled
+        disabled_color = Color(self.base_color)
+        disabled_color.a = 255 // 2
+        if self.is_disabled():
+            return disabled_color
         if self.button.is_pressed():
             return pressed_color
         if self.button.is_hover():
@@ -267,19 +274,23 @@ class Button(GameObject):
         callback: Callable,
         spawn_at: PointSpecifier,
         font: Font | None = None,
+        is_disabled: Callable[[], bool] = lambda: False,
     ):
         # self.game = game
         self.label = label
         self.callback = callback
         self._spawn_at = spawn_at
         self.font = font or game.fonts.button()
+        self.is_disabled = is_disabled
         self.texture = ButtonTexture(
-            game, self, self.get_content, self.font, Color("green")
+            game, self, self.get_content, self.font, Color("green"), self.is_disabled
         )
         super().__init__(game, self.texture)
         self.events.on(GameEvent.CLICK, self.run_callback)
 
     def run_callback(self, _):
+        if self.is_disabled():
+            return
         self.callback()
 
     def get_content(self):
