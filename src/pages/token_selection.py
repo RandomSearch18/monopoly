@@ -1,10 +1,12 @@
 from __future__ import annotations
+from copy import copy
 from typing import TYPE_CHECKING, Callable
 
 from pygame import Color
 
 from components import Button, Container, Header, TextObject
 from data_storage import Player, Token
+from events import GameEvent
 from game_engine import (
     END,
     START,
@@ -123,6 +125,22 @@ class PlayerList(Container):
         self.tick_tasks.append(self.update_children)
 
 
+class TokenSelectionButton(Button):
+    def __init__(self, token_selection_pane: TokenSelectionPane, token: Token):
+        super().__init__(
+            token_selection_pane.game,
+            token.value.capitalize(),
+            self.on_selection,
+            Container.AutoPlacement(5),
+        )
+        self.token_selection_pane = token_selection_pane
+        self.token = copy(token)
+
+    def on_selection(self):
+        print(f"Emitting selected {self.token}")
+        self.token_selection_pane.events.emit(GameEvent.TOKEN_SELECTED, self.token)
+
+
 class TokenSelectionButtons(Container):
     def get_size(self) -> tuple[float, float]:
         total_height = sum(child.height() for child in self.list_children())
@@ -134,20 +152,16 @@ class TokenSelectionButtons(Container):
         self,
         game: Monopoly,
         page: TokenSelection,
+        parent_pane: TokenSelectionPane,
         spawn_at: PointSpecifier,
         on_token_selection: Callable[[Token], None],
     ):
         self.page = page
+        self.parent_pane = parent_pane
         super().__init__(game, spawn_at, self.get_size)
         self.on_token_selection = on_token_selection
         token_buttons = [
-            Button(
-                game,
-                token.value.capitalize(),
-                lambda token=token: self.on_token_selection(token),
-                Container.AutoPlacement(5),
-            )
-            for token in Token
+            TokenSelectionButton(self.parent_pane, token) for token in Token
         ]
         self.add_children(*token_buttons)
 
@@ -186,6 +200,7 @@ class TokenSelectionPane(Container):
         self.token_selection_buttons = TokenSelectionButtons(
             self.game,
             self.page,
+            self,
             PointSpecifier(
                 CenterAlignedToObject(self, self.width),
                 BelowObject(self.description, 5),
@@ -194,6 +209,7 @@ class TokenSelectionPane(Container):
             self.on_token_selection,
         )
         self.add_children(self.heading, self.description, self.token_selection_buttons)
+        self.events.on(GameEvent.TOKEN_SELECTED, self.on_token_selection)
 
 
 class HintText(TextObject):
@@ -237,6 +253,7 @@ class TokenSelection(Page["Monopoly"]):
 
     def show_token_selection_pane(self, player: Player):
         if self.token_selection_pane:
+            print(f"Removing {self.token_selection_pane}")
             self.remove_object(self.token_selection_pane)
             self.token_selection_pane = None
         if self.hint_text:

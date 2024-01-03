@@ -618,6 +618,8 @@ class Page(Generic[T]):
         self.game.add_objects(*objects)
 
     def remove_object(self, object: GameObject[T]):
+        object.exists = False
+        object.events.emit(GameEvent.OBJECT_REMOVE)
         self._objects.remove(object)
         self.game.remove_object(object)
 
@@ -899,6 +901,7 @@ class GameObject(Generic[T]):
         self.spawned_at = pygame.time.get_ticks()
         self.current_coordinates: Tuple[float, float] | None = None
         self.exists = False
+        self.parent: GameObject | None = None
         self.reset()
 
     def draw(self):
