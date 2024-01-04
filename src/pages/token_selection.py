@@ -82,7 +82,7 @@ class PlayerList(Container):
             "+ Add player",
             self.add_new_player,
             Container.AutoPlacement(),
-            is_disabled=lambda: self.game.current_game.data.get_free_player_slots() <= 0
+            is_enabled=lambda: self.game.current_game.data.get_free_player_slots() > 0
             if self.game.current_game
             else True,
         )
@@ -94,7 +94,7 @@ class PlayerList(Container):
                 CenterAlignedToObject(self, self.width),
                 Pixels(10, outer_edge=END, position=END),
             ),
-            is_disabled=lambda: not self.game.current_game.data.ready_to_start()
+            is_enabled=lambda: self.game.current_game.data.ready_to_start()
             if self.game.current_game
             else True,
         )
@@ -114,14 +114,16 @@ class TokenSelectionButton(Button):
             token.value.capitalize(),
             self.on_selection,
             Container.AutoPlacement(5),
-            is_disabled=self.is_disabled,
+            is_enabled=self.is_enabled,
         )
         self.current_game = current_game
         self.token_selection_pane = token_selection_pane
         self.token = copy(token)
 
-    def is_disabled(self):
-        return self.token in [player.token for player in self.current_game.data.players]
+    def is_enabled(self):
+        return self.token not in [
+            player.token for player in self.current_game.data.players
+        ]
 
     def on_selection(self):
         print(f"Emitting selected {self.token}")
