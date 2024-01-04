@@ -922,13 +922,16 @@ class GameObject(Generic[T]):
         self.parent: GameObject | None = None
         self.reset()
 
+    def mark_as_spawned(self):
+        self.exists = True
+        self.events.emit(GameEvent.BEFORE_SPAWN)
+
     def draw(self):
         self.current_coordinates = self.position().calculate_top_left(
             self.game, self.width(), self.height()
         )
         if not self.exists:
-            self.exists = True
-            self.events.emit(GameEvent.BEFORE_SPAWN)
+            self.mark_as_spawned()
         # print(self, self.position.resolve(self.game))
         self.texture.draw_at(self.position())
 

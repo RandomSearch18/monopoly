@@ -49,6 +49,7 @@ class Container(GameObject["Monopoly"]):
         self.tick_tasks.append(self.run_child_tick_tasks)
         self.padding_top = padding_top
 
+        self.events.on(GameEvent.BEFORE_SPAWN, self.spawn_children)
         self.events.on(GameEvent.OBJECT_REMOVE, self.remove_all_children)
 
     def spawn_point(self) -> PointSpecifier:
@@ -122,7 +123,14 @@ class Container(GameObject["Monopoly"]):
                 raise RuntimeError(f"{object} is already a child of {self}")
             object.parent = self
         self._children.extend(objects)
-        self.game.all_objects.extend(objects)
+        if self.exists:
+            self.game.all_objects.extend(objects)
+
+    def spawn_children(self):
+        assert self.exists, "Children should only be spawned once the container exists"
+        for child in self._children:
+            child.mark_as_spawned()
+        self.game.all_objects.extend(self._children)
 
     def remove_all_children(self):
         for child in self._children:
