@@ -241,9 +241,10 @@ class ButtonTexture(TextTexture):
         get_content: Callable[[], str | Tuple[str, Color]],
         font: Font,
         base_color: Color,
+        border_radius: float,
         is_enabled: Callable[[], bool],
     ):
-        super().__init__(game, get_content, font)
+        super().__init__(game, get_content, font, border_radius=border_radius)
         self.button = object
         self.base_color = base_color
         self.is_enabled = is_enabled
@@ -285,6 +286,7 @@ class Button(GameObject):
         callback: Callable,
         spawn_at: PointSpecifier,
         font: Font | None = None,
+        border_radius: float = 5,
         is_enabled: Callable[[], bool] = lambda: True,
     ):
         # self.game = game
@@ -293,8 +295,15 @@ class Button(GameObject):
         self._spawn_at = spawn_at
         self.font = font or game.fonts.button()
         self.is_enabled = is_enabled
+        self.border_radius = border_radius
         self.texture = ButtonTexture(
-            game, self, self.get_content, self.font, Color("green"), self.is_enabled
+            game,
+            self,
+            self.get_content,
+            self.font,
+            Color("green"),
+            self.border_radius,
+            self.is_enabled,
         )
         super().__init__(game, self.texture)
         self.events.on(GameEvent.CLICK, self.run_callback)

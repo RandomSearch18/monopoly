@@ -825,6 +825,7 @@ class TextTexture(Texture):
         break_line_at: CoordinateSpecifier | None = None,
         default_color: Color | None = None,
         padding: Tuple[float, float] = (0, 0),
+        border_radius=0.0,
     ):
         self.game = game
         self._get_content = get_content
@@ -832,6 +833,7 @@ class TextTexture(Texture):
         self._padding = padding
         self.default_color = default_color
         self.break_line_at = break_line_at
+        self.border_radius = border_radius
         # Before first render, use bboxes that are the correct size but at an arbitrary position.
         # This is becuase we might need to use the bbox size to resolve its spawn position
         self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
@@ -851,10 +853,15 @@ class TextTexture(Texture):
         background_color = self.get_background_color()
         if not background_color:
             return
-        # We have to use a filled surface becuase rectangles can't be transparent, https://stackoverflow.com/a/6350227/
-        surface = pygame.Surface((outer_box.width, outer_box.height))
+        # We have to use a seperate surface becuase rectangles can't be transparent, https://stackoverflow.com/a/6350227/
+        surface = pygame.Surface((outer_box.width, outer_box.height), pygame.SRCALPHA)
         surface.set_alpha(self.calculate_surface_alpha())
-        surface.fill(background_color)
+        pygame.draw.rect(
+            surface,
+            background_color,
+            surface.get_rect(),
+            border_radius=int(self.border_radius),
+        )
         self.game.surface.blit(surface, outer_box.top_left)
 
     def draw_at(self, position: PointSpecifier):
