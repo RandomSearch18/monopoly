@@ -244,11 +244,11 @@ class ButtonTexture(TextTexture):
         # Lighten the color if the button is hovered or pressed
         hover_color = self.base_color.lerp("white", 0.4)
         pressed_color = self.base_color.lerp("white", 0.6)
-        # Apply 50% opacity if the button is disabled
-        disabled_color = Color(self.base_color)
-        disabled_color.a = 255 // 2
+        self.opacity = 1
         if self.is_disabled():
-            return disabled_color
+            # Apply 30% opacity if the button is disabled
+            self.opacity = 0.3
+            return self.base_color
         if self.button.is_pressed():
             return pressed_color
         if self.button.is_hover():

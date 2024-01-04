@@ -341,6 +341,10 @@ class Box:
     def right(self) -> float:
         return self.x2
 
+    @property
+    def top_left(self) -> Tuple[float, float]:
+        return (self.x1, self.y1)
+
     def enlarge_by_x(self, pixels: float):
         """Enlarges the box by the provided number of pixels on the left and the right"""
         self.x1 -= pixels
@@ -831,12 +835,27 @@ class TextTexture(Texture):
         # Before first render, use bboxes that are the correct size but at an arbitrary position.
         # This is becuase we might need to use the bbox size to resolve its spawn position
         self.current_outer_box, self.current_text_rect = self.get_dummy_bounding_boxes()
+        self.opacity = 1
 
     def get_background_color(self) -> Color | None:
         return None
 
     def get_padding(self) -> Tuple[float, float]:
         return self._padding
+
+    def calculate_surface_alpha(self):
+        """Converts our own opacity percentage into an alpha value that should be applied to drawn surfaces"""
+        return int(self.opacity * 255)
+
+    def draw_background(self, outer_box: Box):
+        background_color = self.get_background_color()
+        if not background_color:
+            return
+        # We have to use a filled surface becuase rectangles can't be transparent, https://stackoverflow.com/a/6350227/
+        surface = pygame.Surface((outer_box.width, outer_box.height))
+        surface.set_alpha(self.calculate_surface_alpha())
+        surface.fill(background_color)
+        self.game.surface.blit(surface, outer_box.top_left)
 
     def draw_at(self, position: PointSpecifier):
         top_left = position.calculate_top_left(
@@ -846,9 +865,8 @@ class TextTexture(Texture):
         text_surface, outer_box, text_rect = self.render_wrapped_text(top_left, padding)
         self.current_outer_box = outer_box
         self.current_text_rect = text_rect
-        background = self.get_background_color()
-        if background:
-            pygame.draw.rect(self.game.surface, background, outer_box.to_rect())
+        self.draw_background(outer_box)
+        text_surface.set_alpha(self.calculate_surface_alpha())
         self.game.surface.blit(text_surface, text_rect)
 
 
