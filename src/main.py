@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import pygame
-from data_storage import Player, SavedGameData
+from data_storage import Player, SavedGameData, Token
 from game_engine import Fonts, Game, Page, Theme
 from pages.title_screen import TitleScreen
 from pages.token_selection import TokenSelection
@@ -53,6 +53,10 @@ class SavedGameManager:
 
     def add_player(self, player: Player):
         self.data.players.append(player)
+        self.save_to_disk()
+
+    def set_player_token(self, player: Player, token: Token):
+        player.set_token(token)
         self.save_to_disk()
 
     def save_to_disk(self):

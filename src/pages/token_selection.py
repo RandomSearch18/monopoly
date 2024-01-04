@@ -184,10 +184,12 @@ class TokenSelectionPane(Container):
 
     def on_token_selection(self, token: Token):
         print(f"TokenSelectionPane: {self.player} selected {token}")
-        self.player.set_token(token)
+        assert self.game.current_game
+        self.game.current_game.set_player_token(self.player, token)
 
     def __init__(self, game: Monopoly, page: TokenSelection, player: Player):
         self.player = player
+        print(player)
         self.page = page
         super().__init__(game, page.get_main_pane_start_point(), self.get_size)
 
