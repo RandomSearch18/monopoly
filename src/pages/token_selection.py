@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import copy
 from typing import TYPE_CHECKING, Callable
 
 from components import Button, Container, Header, TextObject
@@ -117,6 +118,32 @@ class PlayerList(Container):
         self.tick_tasks.append(self.update_children)
 
 
+class TokenSelectionButton(Button):
+    def __init__(
+        self,
+        current_game: SavedGameManager,
+        token_selection_pane: TokenSelectionPane,
+        token: Token,
+    ):
+        super().__init__(
+            token_selection_pane.game,
+            token.value.capitalize(),
+            self.on_selection,
+            Container.AutoPlacement(5),
+            is_disabled=self.is_disabled,
+        )
+        self.current_game = current_game
+        self.token_selection_pane = token_selection_pane
+        self.token = copy(token)
+
+    def is_disabled(self):
+        return self.token in [player.token for player in self.current_game.data.players]
+
+    def on_selection(self):
+        print(f"Emitting selected {self.token}")
+        self.token_selection_pane.events.emit(GameEvent.TOKEN_SELECTED, self.token)
+
+
 class TokenSelectionButtons(Container):
     def get_size(self) -> tuple[float, float]:
         total_height = sum(child.height() for child in self.list_children())
@@ -128,36 +155,22 @@ class TokenSelectionButtons(Container):
         self,
         game: Monopoly,
         page: TokenSelection,
+        parent_pane: TokenSelectionPane,
         spawn_at: PointSpecifier,
         on_token_selection: Callable[[Token], None],
     ):
         self.page = page
+        self.parent_pane = parent_pane
         super().__init__(game, spawn_at, self.get_size)
         self.on_token_selection = on_token_selection
         self.events.on(GameEvent.BEFORE_SPAWN, self.on_spawn)
-
-    def generate_token_button(self, current_game: SavedGameManager, token: Token):
-        def on_click(token=token):
-            return self.on_token_selection(token)
-
-        def is_disabled(token=token):
-            return current_game is not None and token in [
-                player.token for player in current_game.data.players
-            ]
-
-        return Button(
-            self.game,
-            token.name.capitalize(),
-            on_click,
-            Container.AutoPlacement(5),
-            is_disabled=is_disabled,
-        )
 
     def on_spawn(self):
         current_game = self.game.current_game
         assert current_game
         token_buttons = [
-            self.generate_token_button(current_game, token) for token in Token
+            TokenSelectionButton(current_game, self.parent_pane, token)
+            for token in Token
         ]
         self.add_children(*token_buttons)
 
@@ -197,6 +210,7 @@ class TokenSelectionPane(Container):
         self.token_selection_buttons = TokenSelectionButtons(
             self.game,
             self.page,
+            self,
             PointSpecifier(
                 CenterAlignedToObject(self, self.width),
                 BelowObject(self.description, 5),
@@ -205,6 +219,7 @@ class TokenSelectionPane(Container):
             self.on_token_selection,
         )
         self.add_children(self.heading, self.description, self.token_selection_buttons)
+        self.events.on(GameEvent.TOKEN_SELECTED, self.on_token_selection)
 
 
 class HintText(TextObject):
@@ -248,6 +263,7 @@ class TokenSelection(Page["Monopoly"]):
 
     def show_token_selection_pane(self, player: Player):
         if self.token_selection_pane:
+            print(f"Removing {self.token_selection_pane}")
             self.remove_object(self.token_selection_pane)
             self.token_selection_pane = None
         if self.hint_text:

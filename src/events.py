@@ -5,6 +5,7 @@ class GameEvent(Enum):
     CLICK = "click"
     OBJECT_REMOVE = "object_remove"
     BEFORE_SPAWN = "before_first_draw"
+    TOKEN_SELECTED = "token_selection.token_selected"
 
 
 class EventEmitter:
