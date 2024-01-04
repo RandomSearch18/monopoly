@@ -52,6 +52,8 @@ class SavedGameManager:
         self.save_file_exists = False
 
     def add_player(self, player: Player):
+        if not self.data.get_free_player_slots():
+            raise RuntimeError("Can't add player to a full game")
         self.data.players.append(player)
         self.save_to_disk()
 
